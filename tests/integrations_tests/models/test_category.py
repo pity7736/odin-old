@@ -5,7 +5,7 @@ from src.accounting.models import Category
 
 
 @mark.asyncio
-async def test_save_returning_id(create_db, event_loop):
+async def test_save_returning_id(create_db):
     category = Category(name='test name', description='test description')
     assert category.id is None
     await category.save()
@@ -13,7 +13,7 @@ async def test_save_returning_id(create_db, event_loop):
 
 
 @mark.asyncio
-async def test_save_without_description(create_db, event_loop):
+async def test_save_without_description(create_db):
     category = Category(name='test', description='')
     with raises(NotNullViolationError):
         await category.save()

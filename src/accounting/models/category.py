@@ -18,4 +18,6 @@ class Category:
             port=settings.DB_PORT,
             database=settings.DB_NAME
         )
-        self.id = await con.fetchval('insert into categories(name, description) values ($1, $2) RETURNING id', self.name, self.description)
+        self.id = await con.fetchval(
+            'insert into categories(name, description) values ($1, $2) RETURNING id', self.name, self.description
+        )
