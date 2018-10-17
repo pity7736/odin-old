@@ -14,6 +14,6 @@ async def test_save_returning_id(create_db):
 
 @mark.asyncio
 async def test_save_without_description(create_db):
-    category = Category(name='test', description='')
+    category = Category(name='test', description=None)
     with raises(NotNullViolationError):
         await category.save()

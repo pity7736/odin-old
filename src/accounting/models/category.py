@@ -19,5 +19,7 @@ class Category:
             database=settings.DB_NAME
         )
         self.id = await con.fetchval(
-            'insert into categories(name, description) values ($1, $2) RETURNING id', self.name, self.description
+            'insert into categories(name, description) values ($1, $2) RETURNING id',
+            self.name,
+            self.description
         )
