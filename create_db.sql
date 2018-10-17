@@ -1,6 +1,9 @@
-DROP DATABASE IF EXISTS test_odin;
-CREATE DATABASE test_odin WITH OWNER odin;
-\c test_odin
+\set db_name `echo $DB_NAME`
+\set db_user `echo $DB_USER`
+DROP DATABASE IF EXISTS :db_name;
+CREATE DATABASE :db_name WITH OWNER :db_user;
+\c :db_name
+
 BEGIN;
 
 CREATE TABLE categories (
