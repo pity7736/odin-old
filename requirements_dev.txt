@@ -1,0 +1,4 @@
+factory-boy==2.11.3
+pytest==3.9.1
+pytest-asyncio==0.9
+pytest-mock==1.10.0
