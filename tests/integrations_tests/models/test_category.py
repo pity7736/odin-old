@@ -6,7 +6,7 @@ from tests.factories import CategoryFactory
 
 
 @mark.asyncio
-async def test_save_returning_id(create_db, db_transaction):
+async def test_save(create_db, db_transaction):
     category = CategoryFactory(name='test name', description='test description')
     assert category.id is None
     await category.save()
