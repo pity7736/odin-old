@@ -4,6 +4,7 @@ import asyncpg
 from pytest import fixture
 
 from src import settings
+from tests.factories import CategoryFactory
 
 
 @fixture(scope='session')
@@ -24,4 +25,11 @@ async def db_transaction():
         port=settings.DB_PORT,
         database=settings.DB_NAME
     )
-    await connection.execute('TRUNCATE categories, subcategories;')
+    await connection.execute('TRUNCATE categories, movements_tags, tags, movements;')
+
+
+@fixture
+async def category():
+    cat = CategoryFactory()
+    await cat.save()
+    return cat

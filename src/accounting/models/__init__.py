@@ -1,2 +1,3 @@
 from .category import Category
-from .subcategory import SubCategory
+from .movement import Movement
+from .tag import Tag
