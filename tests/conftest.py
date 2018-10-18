@@ -4,7 +4,7 @@ import uvloop
 from pytest import fixture
 
 
-@fixture
+@fixture(scope='session')
 def event_loop():
     print('creating loop')
     loop = uvloop.new_event_loop()
