@@ -4,7 +4,7 @@ import asyncpg
 from pytest import fixture
 
 from src import settings
-from tests.factories import CategoryFactory
+from tests.factories import CategoryFactory, MovementFactory
 
 
 @fixture(scope='session')
@@ -26,6 +26,7 @@ async def db_transaction():
         database=settings.DB_NAME
     )
     await connection.execute('TRUNCATE categories, movements_tags, tags, movements;')
+    await connection.close()
 
 
 @fixture
@@ -33,3 +34,10 @@ async def category():
     cat = CategoryFactory()
     await cat.save()
     return cat
+
+
+@fixture
+async def movement(category):
+    mov = MovementFactory(category=category)
+    await mov.save()
+    return mov

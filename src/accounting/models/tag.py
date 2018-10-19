@@ -21,3 +21,4 @@ class Tag:
             'insert into tags(name) values ($1) RETURNING id',
             self.name,
         )
+        await con.close()

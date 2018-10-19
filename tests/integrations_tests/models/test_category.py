@@ -1,6 +1,8 @@
+import asyncpg
 from asyncpg import NotNullViolationError
 from pytest import mark, raises
 
+from src import settings
 from src.accounting.models import Category
 from tests.factories import CategoryFactory
 
@@ -8,9 +10,23 @@ from tests.factories import CategoryFactory
 @mark.asyncio
 async def test_save(create_db, db_transaction):
     category = CategoryFactory(id=None, name='test name', description='test description')
-    assert category.id is None
     await category.save()
-    assert category.id is not None
+    con = await asyncpg.connect(
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+        database=settings.DB_NAME
+    )
+    record = await con.fetchrow(
+        'select * from categories where id = $1',
+        category.id
+    )
+    await con.close()
+
+    assert category.id == record['id']
+    assert category.name == record['name']
+    assert category.description == record['description']
 
 
 @mark.asyncio
@@ -21,7 +37,7 @@ async def test_save_without_description():
 
 
 @mark.asyncio
-async def test_filter_by_name_without_categories(create_db, db_transaction):
+async def test_filter_by_name_with_not_existing_categories(create_db, db_transaction):
     categories = await Category.filter(name='test name')
     assert categories == []
 

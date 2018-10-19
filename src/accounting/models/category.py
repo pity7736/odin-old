@@ -23,6 +23,7 @@ class Category:
             self.name,
             self.description
         )
+        await con.close()
 
     @classmethod
     async def get(cls, id):
@@ -37,6 +38,7 @@ class Category:
             'select * from categories where id = $1',
             id
         )
+        await con.close()
         if record:
             category = cls(id=id, name=record['name'], description=record['description'])
             return category
@@ -65,6 +67,7 @@ class Category:
             f'select * from categories where {field} = $1',
             value
         )
+        await con.close()
         result = []
         for category in categories:
             result.append(Category(id=category['id'], name=category['name'], description=category['description']))
