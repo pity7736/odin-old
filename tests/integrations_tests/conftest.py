@@ -41,3 +41,16 @@ async def movement(category):
     mov = MovementFactory(category=category)
     await mov.save()
     return mov
+
+
+@fixture
+async def connection():
+    con = await asyncpg.connect(
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+        database=settings.DB_NAME
+    )
+    yield con
+    await con.close()

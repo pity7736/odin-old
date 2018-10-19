@@ -1,28 +1,18 @@
-import asyncpg
 from asyncpg import NotNullViolationError
 from pytest import mark, raises
 
-from src import settings
 from src.accounting.models import Category
 from tests.factories import CategoryFactory
 
 
 @mark.asyncio
-async def test_save(create_db, db_transaction):
+async def test_save(create_db, db_transaction, connection):
     category = CategoryFactory(id=None, name='test name', description='test description')
     await category.save()
-    con = await asyncpg.connect(
-        user=settings.DB_USER,
-        password=settings.DB_PASSWORD,
-        host=settings.DB_HOST,
-        port=settings.DB_PORT,
-        database=settings.DB_NAME
-    )
-    record = await con.fetchrow(
+    record = await connection.fetchrow(
         'select * from categories where id = $1',
         category.id
     )
-    await con.close()
 
     assert category.id == record['id']
     assert category.name == record['name']
