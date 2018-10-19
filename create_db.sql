@@ -38,4 +38,12 @@ CREATE TABLE movements_tags (
   movement_id INTEGER REFERENCES movements NOT NULL
 );
 
+CREATE TABLE test_model (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(40) NOT NULL,
+  date DATE NOT NULL,
+  note TEXT
+);
+
+
 COMMIT;

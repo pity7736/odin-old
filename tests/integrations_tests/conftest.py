@@ -25,7 +25,7 @@ async def db_transaction():
         port=settings.DB_PORT,
         database=settings.DB_NAME
     )
-    await connection.execute('TRUNCATE categories, movements_tags, tags, movements;')
+    await connection.execute('TRUNCATE categories, movements_tags, tags, movements, test_model;')
     await connection.close()
 
 

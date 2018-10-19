@@ -1,29 +1,15 @@
 import asyncpg
 
 from src import settings
+from src.db.fields import Field
+from src.db.models import Model
 
 
-class Category:
-
-    def __init__(self, id: int=None, name: str=None, description: str=None):
-        self.id = id
-        self.name = name
-        self.description = description
-
-    async def save(self):
-        con = await asyncpg.connect(
-            user=settings.DB_USER,
-            password=settings.DB_PASSWORD,
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            database=settings.DB_NAME
-        )
-        self.id = await con.fetchval(
-            'insert into categories(name, description) values ($1, $2) RETURNING id',
-            self.name,
-            self.description
-        )
-        await con.close()
+class Category(Model):
+    __table_name__ = 'categories'
+    id = Field(name='id')
+    name = Field(name='name')
+    description = Field(name='description')
 
     @classmethod
     async def get(cls, id):

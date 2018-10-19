@@ -7,6 +7,7 @@ from src.db.fields import Field
 
 
 class ChildModel(Model):
+    __table_name__ = 'Test model'
     id = Field(name='id')
     name = Field(name='name')
     date = Field(name='date')
@@ -31,3 +32,9 @@ def test_instantiate_with_only_name():
     assert instance.name == 'hi'
     assert instance.id is None
     assert instance.date is None
+
+
+def test_model_must_have_a_table_name():
+    with raises(AssertionError):
+        class M(Model):
+            pass
