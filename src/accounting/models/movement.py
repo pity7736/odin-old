@@ -20,7 +20,7 @@ class Movement(Model):
         if self.category:
             return self.category
 
-        self.category = await Category.get(self.category_id)
+        self.category = await Category.get(id=self.category_id)
         return self.category
 
     async def add_tags(self, *tags):

@@ -27,7 +27,7 @@ async def connection():
     await con.close()
 
 
-@fixture()
+@fixture
 async def db_transaction(connection):
     # TODO: refactor this for a better solution
     yield
