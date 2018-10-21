@@ -1,3 +1,6 @@
+import datetime
+
+
 class Field:
 
     __slots__ = ('name',)
@@ -5,8 +8,15 @@ class Field:
     def __init__(self, name=''):
         self.name = name
 
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
+    def to_db(self, value):
+        return value
 
-        return vars(instance)[self.name]
+
+class DateField(Field):
+
+    def to_db(self, value):
+        if isinstance(value, datetime.date) or value is None:
+            return value
+
+        if isinstance(value, str):
+            return datetime.date.fromisoformat(value)

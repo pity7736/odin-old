@@ -4,49 +4,29 @@ import asyncpg
 
 from src import settings
 from src.accounting.models import Category
+from src.db.fields import Field, ForeignKeyField, DateField
+from src.db.models import Model
 
 
-class Movement:
+class Movement(Model):
+    __table_name__ = 'movements'
+    id = Field(name='id')
+    type = Field(name='type')
+    date = DateField(name='date')
+    value = Field(name='value')
+    note = Field(name='note')
+    category = ForeignKeyField(name='category', to=Category)
 
-    def __init__(self, id=None, type=None, date=None, value=None, note=None, category=None, category_id=None):
-        self.id = id
-        self.type = type
-        self.date = date
-        self.value = value
-        self.note = note
-        self._category = category
-        self.category_id = category_id
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self._tags = []
 
-    async def save(self):
-        if isinstance(self.date, str):
-            self.date = datetime.date.fromisoformat(self.date)
-
-        con = await asyncpg.connect(
-            user=settings.DB_USER,
-            password=settings.DB_PASSWORD,
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            database=settings.DB_NAME
-        )
-        category_id = getattr(self._category, 'id', self.category_id)
-        self.id = await con.fetchval(
-            'insert into movements(type, date, value, note, category_id) values ($1, $2, $3, $4, $5) RETURNING id',
-            self.type,
-            self.date,
-            self.value,
-            self.note,
-            category_id
-        )
-        self.category_id = category_id
-        await con.close()
-
     async def get_category(self):
-        if self._category:
-            return self._category
+        if self.category:
+            return self.category
 
-        self._category = await Category.get(self.category_id)
-        return self._category
+        self.category = await Category.get(self.category_id)
+        return self.category
 
     async def add_tags(self, *tags):
         con = await asyncpg.connect(

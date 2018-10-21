@@ -1,6 +1,7 @@
 import asyncpg
 
 from src import settings
+from src.db.fields import ForeignKeyField
 from src.db.fields.field import Field
 
 
@@ -24,12 +25,14 @@ class Model(metaclass=MetaModel):
     __table_name__ = ''
 
     def __init__(self, **kwargs):
-        for key, value in self._fields.items():
+        for key, field in self._fields.items():
             value = kwargs.get(key)
             setattr(self, key, value)
+            if isinstance(field, ForeignKeyField):
+                setattr(self, f'{key}_id', None)
 
         for key, value in kwargs.items():
-            if key not in self._fields.keys():
+            if key not in self._fields.keys() and key not in vars(self):
                 raise TypeError(f'Invalid field: {key} is not a field of {self.__class__}')
             setattr(self, key, value)
 
@@ -46,10 +49,17 @@ class Model(metaclass=MetaModel):
         arguments = []
         i = 1
         for field in self._fields.values():
-            if field.name != 'id':
-                fields.append(field.name)
+            field_name = field.name
+            if field_name != 'id':
+                if isinstance(field, ForeignKeyField):
+                    instance = getattr(self, field_name)
+                    field_name = f'{field_name}_id'
+                    if instance:
+                        setattr(self, field_name, instance.id)
+
+                fields.append(field_name)
                 values.append(f'${i}')
-                arguments.append(getattr(self, field.name))
+                arguments.append(field.to_db(getattr(self, field_name)))
                 i += 1
 
         fields = ', '.join(fields)

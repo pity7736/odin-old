@@ -51,8 +51,7 @@ async def test_save_with_isoformat_date(create_db, db_transaction, category):
     movement = Movement(type='expense', date='2018-10-18', value=10000, category=category)
     await movement.save()
 
-    assert isinstance(movement.date, datetime.date)
-    assert str(movement.date) == '2018-10-18'
+    assert movement.date == '2018-10-18'
 
 
 @mark.asyncio
@@ -95,7 +94,7 @@ async def test_add_two_tags_to_movement(create_db, db_transaction, movement, con
 
 @mark.asyncio
 async def test_get_category_with_movement_category_instance(create_db, db_transaction, category):
-    movement = Movement(type='expense', date='18-10-2018', value=10000, category=category)
+    movement = Movement(type='expense', date='2018-10-18', value=10000, category=category)
     mov_category = await movement.get_category()
 
     assert mov_category == category
@@ -103,7 +102,7 @@ async def test_get_category_with_movement_category_instance(create_db, db_transa
 
 @mark.asyncio
 async def test_get_category_with_movement_category_id(create_db, db_transaction, category):
-    movement = Movement(type='expense', date='18-10-2018', value=10000, category_id=category.id)
+    movement = Movement(type='expense', date='2018-10-18', value=10000, category_id=category.id)
     mov_category = await movement.get_category()
 
     assert mov_category != category
