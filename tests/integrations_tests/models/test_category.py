@@ -62,3 +62,33 @@ async def test_filter_without_params(create_db, db_transaction):
 
     with raises(AssertionError):
         await Category.filter()
+
+
+@mark.asyncio
+async def test_get_by_id(create_db, db_transaction, category):
+    record = await Category.get(id=category.id)
+
+    assert record != category
+    assert record.id == category.id
+    assert record.name == category.name
+    assert record.description == category.description
+
+
+@mark.asyncio
+async def test_get_by_name(create_db, db_transaction, category):
+    record = await Category.get(name=category.name)
+
+    assert record != category
+    assert record.id == category.id
+    assert record.name == category.name
+    assert record.description == category.description
+
+
+@mark.asyncio
+async def test_get_by_id_and_name(create_db, db_transaction, category):
+    record = await Category.get(id=category.id, name=category.name)
+
+    assert record != category
+    assert record.id == category.id
+    assert record.name == category.name
+    assert record.description == category.description
