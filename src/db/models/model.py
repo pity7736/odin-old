@@ -37,13 +37,6 @@ class Model(metaclass=MetaModel):
             setattr(self, key, value)
 
     async def save(self):
-        con = await asyncpg.connect(
-            user=settings.DB_USER,
-            password=settings.DB_PASSWORD,
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            database=settings.DB_NAME
-        )
         fields = []
         values = []
         arguments = []
@@ -64,32 +57,32 @@ class Model(metaclass=MetaModel):
 
         fields = ', '.join(fields)
         values = ', '.join(values)
+        con = await self._get_connection()
         sql = f'insert into {self.__table_name__}({fields}) values ({values}) RETURNING id'.replace("'", '')
-        self.id = await con.fetchval(
-            sql,
-            *arguments
-        )
+        self.id = await con.fetchval(sql, *arguments)
         await con.close()
 
     @classmethod
     async def get(cls, **kwargs):
-        con = await asyncpg.connect(
-            user=settings.DB_USER,
-            password=settings.DB_PASSWORD,
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            database=settings.DB_NAME
-        )
         fields = []
         for i, key in enumerate(kwargs.keys(), start=1):
             fields.append(f'{key} = ${i}')
 
         fields = ' AND '.join(fields)
         sql = f'select * from {cls.__table_name__} where {fields}'
-        record = await con.fetchrow(
-            sql,
-            *kwargs.values()
-        )
+        con = await cls._get_connection()
+        record = await con.fetchrow(sql, *kwargs.values())
         await con.close()
         if record:
             return cls(**record)
+
+    @staticmethod
+    async def _get_connection():
+        # TODO: refactor this. it should not be here
+        return await asyncpg.connect(
+            user=settings.DB_USER,
+            password=settings.DB_PASSWORD,
+            host=settings.DB_HOST,
+            port=settings.DB_PORT,
+            database=settings.DB_NAME
+        )

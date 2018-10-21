@@ -1,6 +1,3 @@
-import asyncpg
-
-from src import settings
 from src.db.fields import Field
 from src.db.models import Model
 
@@ -14,13 +11,7 @@ class Category(Model):
     @classmethod
     async def filter(cls, id=None, name=None, description=None):
         assert id or name or description, 'At least one parameter must be given.'
-        con = await asyncpg.connect(
-            user=settings.DB_USER,
-            password=settings.DB_PASSWORD,
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            database=settings.DB_NAME
-        )
+        con = await cls._get_connection()
         if id:
             field = 'id'
             value = id
@@ -31,10 +22,7 @@ class Category(Model):
             field = 'description'
             value = description
 
-        categories = await con.fetch(
-            f'select * from categories where {field} = $1',
-            value
-        )
+        categories = await con.fetch(f'select * from categories where {field} = $1', value)
         await con.close()
         result = []
         for category in categories:

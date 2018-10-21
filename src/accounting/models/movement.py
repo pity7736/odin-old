@@ -1,8 +1,3 @@
-import datetime
-
-import asyncpg
-
-from src import settings
 from src.accounting.models import Category
 from src.db.fields import Field, ForeignKeyField, DateField
 from src.db.models import Model
@@ -29,13 +24,7 @@ class Movement(Model):
         return self.category
 
     async def add_tags(self, *tags):
-        con = await asyncpg.connect(
-            user=settings.DB_USER,
-            password=settings.DB_PASSWORD,
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            database=settings.DB_NAME
-        )
+        con = await self._get_connection()
         values = [(tag.id, self.id) for tag in tags]
         await con.copy_records_to_table(
             'movements_tags',

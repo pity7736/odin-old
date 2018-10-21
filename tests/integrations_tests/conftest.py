@@ -14,17 +14,23 @@ def create_db():
     subprocess.call(['psql', '-U', settings.DB_USER, '-h', settings.DB_HOST, '-f', sql_file])
 
 
-@fixture()
-async def db_transaction():
-    # TODO: refactor this for a better solution
-    yield
-    connection = await asyncpg.connect(
+@fixture
+async def connection():
+    con = await asyncpg.connect(
         user=settings.DB_USER,
         password=settings.DB_PASSWORD,
         host=settings.DB_HOST,
         port=settings.DB_PORT,
         database=settings.DB_NAME
     )
+    yield con
+    await con.close()
+
+
+@fixture()
+async def db_transaction(connection):
+    # TODO: refactor this for a better solution
+    yield
     await connection.execute('TRUNCATE categories, movements_tags, tags, movements, test_model;')
     await connection.close()
 
@@ -41,16 +47,3 @@ async def movement(category):
     mov = MovementFactory(category=category)
     await mov.save()
     return mov
-
-
-@fixture
-async def connection():
-    con = await asyncpg.connect(
-        user=settings.DB_USER,
-        password=settings.DB_PASSWORD,
-        host=settings.DB_HOST,
-        port=settings.DB_PORT,
-        database=settings.DB_NAME
-    )
-    yield con
-    await con.close()
