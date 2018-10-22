@@ -1,7 +1,9 @@
 asyncpg==0.17.0
 factory-boy==2.11.3
+graphene==2.1.3
 pytest==3.9.1
 pytest-asyncio==0.9
 pytest-dotenv==0.2.0
 pytest-mock==1.10.0
+sanic-graphql==1.1.0
 uvloop==0.11.2

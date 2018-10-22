@@ -1,6 +1,13 @@
+from enum import Enum
+
 from src.accounting.models import Category
 from src.db.fields import Field, ForeignKeyField, DateField
 from src.db.models import Model
+
+
+class MovementTypeEnum(Enum):
+    EXPENSE = 'expense'
+    INCOME = 'income'
 
 
 class Movement(Model):
