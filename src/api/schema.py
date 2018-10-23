@@ -2,6 +2,7 @@ import graphene
 
 from src.accounting.models import Category, Movement
 from src.accounting.mutations.category import CreateCategoryMutation
+from src.accounting.mutations.movement import CreateMovementMutation
 from src.accounting.schemas import CategoryObjectType, MovementObjectType
 
 
@@ -31,6 +32,7 @@ class Query(graphene.ObjectType):
 
 class Mutation(graphene.ObjectType):
     create_category = CreateCategoryMutation.Field()
+    create_movement = CreateMovementMutation.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

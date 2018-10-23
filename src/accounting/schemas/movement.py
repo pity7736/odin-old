@@ -4,9 +4,12 @@ from .category import CategoryObjectType
 from src.accounting.models.movement import MovementTypeEnum
 
 
+MovementType = graphene.Enum.from_enum(MovementTypeEnum)
+
+
 class MovementObjectType(graphene.ObjectType):
     id = graphene.Int()
-    type = graphene.Enum.from_enum(MovementTypeEnum)()
+    type = MovementType()
     date = graphene.Date()
     value = graphene.Int()
     note = graphene.String()

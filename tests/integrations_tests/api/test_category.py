@@ -4,7 +4,6 @@ def test_query_existing_category(create_db, db_transaction, category, graph_clie
         query {{
             category(id: {category.id}) {{
                 name
-                id
                 description
             }}
         }}
@@ -15,7 +14,6 @@ def test_query_existing_category(create_db, db_transaction, category, graph_clie
         'data': {
             'category': {
                 'name': 'test name',
-                'id': 1,
                 'description': 'test description'
             }
         }
@@ -46,7 +44,6 @@ def test_category_mutation(create_db, db_transaction, graph_client):
         mutation {
             createCategory(name: "test category mutation", description: "test description") {
                 category {
-                    id
                     name
                     description
                 }
@@ -59,7 +56,6 @@ def test_category_mutation(create_db, db_transaction, graph_client):
         'data': {
             'createCategory':{
                 'category': {
-                    'id': 1,
                     'name': 'test category mutation',
                     'description': 'test description'
                 }
