@@ -1,48 +1,6 @@
 import datetime
 
 
-def test_query_existing_category(create_db, db_transaction, category, graph_client):
-    query = f'''
-        query {{
-            category(id: {category.id}) {{
-                name
-                id
-                description
-            }}
-        }}
-    '''
-    result = graph_client.execute(query)
-
-    assert result == {
-        'data': {
-            'category': {
-                'name': 'test name',
-                'id': 1,
-                'description': 'test description'
-            }
-        }
-    }
-
-
-def test_query_non_existent_category(create_db, graph_client):
-    query = '''
-        query {
-            category(id: 1) {
-                name
-                id
-                description
-            }
-        }
-    '''
-    result = graph_client.execute(query)
-
-    assert result == {
-        'data': {
-            'category': None
-        }
-    }
-
-
 def test_query_movement(create_db, db_transaction, movement, graph_client):
     query = f'''
         query {{
