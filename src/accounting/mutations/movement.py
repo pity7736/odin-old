@@ -2,28 +2,27 @@ import graphene
 
 from src.accounting.models import Movement
 from src.accounting.schemas import MovementObjectType
-from src.accounting.schemas.movement import MovementType
 
 
-class MovementInput(graphene.InputObjectType):
-    type = MovementType()
+class ExpenseInput(graphene.InputObjectType):
     date = graphene.Date()
     value = graphene.Int()
     note = graphene.String()
     category_id = graphene.Int()
 
 
-class CreateMovementMutation(graphene.Mutation):
-    movement =graphene.Field(MovementObjectType)
+class CreateExpenseMutation(graphene.Mutation):
+    expense = graphene.Field(MovementObjectType)
 
     class Arguments:
-        data = MovementInput(required=True)
+        data = ExpenseInput(required=True)
 
     @staticmethod
     async def mutate(root, info, data):
+        data['type'] = 'expense'
         movement = Movement(**data)
         await movement.save()
-        return CreateMovementMutation(MovementObjectType(
+        return CreateExpenseMutation(MovementObjectType(
             id=movement.id,
             type=movement.type,
             date=movement.date,

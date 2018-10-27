@@ -1,7 +1,7 @@
 import datetime
 
 
-def test_query_movement(create_db, db_transaction, movement, graph_client):
+def test_query_expense(create_db, db_transaction, movement, graph_client):
     query = f'''
         query {{
             movement(id: {movement.id}) {{
@@ -82,17 +82,16 @@ def test_query_movement_with_category(create_db, db_transaction, movement, graph
     }
 
 
-def test_movement_mutation(create_db, db_transaction, graph_client, category):
+def test_expense_mutation(create_db, db_transaction, graph_client, category):
     mutation = f'''
         mutation {{
-            createMovement(data: {{
-                    type: EXPENSE,
+            createExpense(data: {{
                     date: "{datetime.date.today()}",
                     value: 20000,
                     note: "test",
                     categoryId: {category.id}
                 }}) {{
-                movement {{
+                expense {{
                     type
                     date
                     value
@@ -110,8 +109,8 @@ def test_movement_mutation(create_db, db_transaction, graph_client, category):
 
     assert result == {
         'data': {
-            'createMovement': {
-                'movement': {
+            'createExpense': {
+                'expense': {
                     'type': 'EXPENSE',
                     'date': str(datetime.date.today()),
                     'value': 20000,
