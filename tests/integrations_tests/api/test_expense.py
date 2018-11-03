@@ -1,5 +1,12 @@
 import datetime
 
+from graphql import graphql
+from graphql.execution.executors.asyncio import AsyncioExecutor
+from pytest import mark
+
+from src.api import schema
+from tests.factories import MovementFactory
+
 
 def test_query_expense(create_db, db_transaction, movement, graph_client):
     query = f'''
@@ -123,4 +130,67 @@ def test_expense_mutation(create_db, db_transaction, graph_client, category):
                 }
             }
         }
+    }
+
+
+@mark.asyncio
+async def test_query_all_expenses(create_db, db_transaction, category):
+    expenses = MovementFactory.create_batch(5)
+    for i, expense in enumerate(expenses):
+        expense.note = f'note {i}'
+        expense.category = category
+        await expense.save()
+
+    query = '''
+        query {
+            expenses {
+                value
+                note
+                category {
+                    name
+                }
+            }
+        }
+    '''
+
+    result = await graphql(schema, query, executor=AsyncioExecutor(), return_promise=True)
+
+    assert result.data == {
+        'expenses': [
+            {
+                'value': 10000,
+                'note': 'note 0',
+                'category': {
+                    'name': category.name
+                }
+            },
+            {
+                'value': 10000,
+                'note': 'note 1',
+                'category': {
+                    'name': category.name
+                }
+            },
+            {
+                'value': 10000,
+                'note': 'note 2',
+                'category': {
+                    'name': category.name
+                }
+            },
+            {
+                'value': 10000,
+                'note': 'note 3',
+                'category': {
+                    'name': category.name
+                }
+            },
+            {
+                'value': 10000,
+                'note': 'note 4',
+                'category': {
+                    'name': category.name
+                }
+            }
+        ]
     }

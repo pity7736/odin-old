@@ -10,6 +10,7 @@ class Query(graphene.ObjectType):
     category = graphene.Field(CategoryObjectType, id=graphene.Int(required=True))
     categories = graphene.List(CategoryObjectType)
     movement = graphene.Field(MovementObjectType, id=graphene.Int(required=True))
+    expenses = graphene.List(MovementObjectType)
 
     @staticmethod
     async def resolve_category(root, info, id):
@@ -38,6 +39,22 @@ class Query(graphene.ObjectType):
                 note=movement.note,
                 category=CategoryObjectType(id=category.id, name=category.name, description=category.description)
             )
+
+    @staticmethod
+    async def resolve_expenses(root, info):
+        expenses = await Movement.all_expenses()
+        result = []
+        for expense in expenses:
+            category = await expense.get_category()
+            result.append(MovementObjectType(
+                id=expense.id,
+                type=expense.type,
+                date=expense.date,
+                value=expense.value,
+                note=expense.note,
+                category=CategoryObjectType(id=category.id, name=category.name, description=category.description)
+            ))
+        return result
 
 
 class Mutation(graphene.ObjectType):
