@@ -11,12 +11,22 @@ class Query(graphene.ObjectType):
     categories = graphene.List(CategoryObjectType)
     movement = graphene.Field(MovementObjectType, id=graphene.Int(required=True))
 
-    async def resolve_category(self, info, id):
+    @staticmethod
+    async def resolve_category(root, info, id):
         category = await Category.get(id=id)
         if category:
             return CategoryObjectType(id=category.id, name=category.name, description=category.description)
 
-    async def resolve_movement(self, info, id):
+    @staticmethod
+    async def resolve_categories(root, info):
+        categories = await Category.all()
+        result = []
+        for category in categories:
+            result.append(CategoryObjectType(id=category.id, name=category.name, description=category.description))
+        return result
+
+    @staticmethod
+    async def resolve_movement(root, info, id):
         movement = await Movement.get(id=id)
         if movement:
             category = await movement.get_category()

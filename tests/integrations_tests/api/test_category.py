@@ -1,3 +1,10 @@
+from graphql import graphql
+from graphql.execution.executors.asyncio import AsyncioExecutor
+from pytest import mark
+
+from src.api import schema
+from tests.factories import CategoryFactory
+
 
 def test_query_existing_category(create_db, db_transaction, category, graph_client):
     query = f'''
@@ -61,4 +68,41 @@ def test_category_mutation(create_db, db_transaction, graph_client):
                 }
             }
         }
+    }
+
+
+@mark.asyncio
+async def test_query_all_categories(create_db, db_transaction):
+    categories = CategoryFactory.create_batch(5)
+    for i, category in enumerate(categories):
+        category.name = f'name {i}'
+        await category.save()
+
+    query = '''
+        query {
+            categories {
+                name
+            }
+        }
+    '''
+
+    result = await graphql(schema, query, executor=AsyncioExecutor(), return_promise=True)
+    assert result.data == {
+        'categories': [
+            {
+                'name': 'name 0'
+            },
+            {
+                'name': 'name 1'
+            },
+            {
+                'name': 'name 2'
+            },
+            {
+                'name': 'name 3'
+            },
+            {
+                'name': 'name 4'
+            }
+        ]
     }
