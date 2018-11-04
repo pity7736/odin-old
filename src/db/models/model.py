@@ -1,4 +1,5 @@
 import asyncpg
+from immutables import Map
 
 from src import settings
 from src.db.fields import ForeignKeyField
@@ -8,15 +9,14 @@ from src.db.fields.field import Field
 class MetaModel(type):
 
     def __new__(mcs, name, bases, namespace, **kwargs):
-        # TODO: use inmmutable map lib
         assert '__table_name__' in namespace, 'All model must have a __table_name__ attribute'
-        fields = {}
+        fields = Map()
         for attr, value in namespace.items():
             if isinstance(value, Field):
-                fields[attr] = value
+                fields = fields.set(attr, value)
 
+        namespace['_fields'] = fields
         model = type.__new__(mcs, name, bases, namespace)
-        model._fields = fields
         return model
 
 
