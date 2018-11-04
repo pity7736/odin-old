@@ -25,24 +25,7 @@ class Movement(Model):
 
     @classmethod
     async def all_expenses(cls):
-        return await cls.filter('expense')
-
-    @classmethod
-    async def filter(cls, type=None):
-        con = await cls._get_connection()
-        expenses = await con.fetch('select * from movements where type = $1', type)
-        await con.close()
-        result = []
-        for expense in expenses:
-            result.append(cls(
-                id=expense['id'],
-                type=expense['type'],
-                date=expense['date'],
-                value=expense['value'],
-                note=expense['note'],
-                category_id=expense['category_id']
-            ))
-        return result
+        return await cls.filter(type='expense')
 
     async def get_category(self):
         if self.category:

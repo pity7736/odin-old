@@ -77,13 +77,29 @@ class Model(metaclass=MetaModel):
             return cls(**record)
 
     @classmethod
-    async def all(cls):
+    async def filter(cls, **kwargs):
+        assert kwargs, 'keyword arguments are obligatory. If you want all records, use all method instead.'
+        fields = []
+        for i, field in enumerate(kwargs.keys(), start=1):
+            fields.append(f'{field} = ${i}')
+
+        fields = ' AND '.join(fields)
         connection = await cls._get_connection()
-        records = await connection.fetch(f'select * from {cls.__table_name__}')
+        records = await connection.fetch(f'select * from {cls.__table_name__} where {fields}', *kwargs.values())
+        await connection.close()
         result = []
         for record in records:
             result.append(cls(**record))
+        return result
+
+    @classmethod
+    async def all(cls):
+        connection = await cls._get_connection()
+        records = await connection.fetch(f'select * from {cls.__table_name__}')
         await connection.close()
+        result = []
+        for record in records:
+            result.append(cls(**record))
         return result
 
     @staticmethod
