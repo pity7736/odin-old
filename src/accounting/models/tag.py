@@ -1,8 +1,7 @@
-from src.db.fields import Field
-from src.db.models import Model
+from gideon.fields import Field
+from gideon.models import Model
 
 
 class Tag(Model):
     __table_name__ = 'tags'
-    id = Field(name='id')
-    name = Field(name='name')
+    _name = Field(name='name')

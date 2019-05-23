@@ -1,8 +1,9 @@
 from enum import Enum
 
+from gideon.fields import Field, DateField, ForeignKeyField
+from gideon.models import Model
+
 from src.accounting.models import Category
-from src.db.fields import Field, ForeignKeyField, DateField
-from src.db.models import Model
 
 
 class MovementTypeEnum(Enum):
@@ -12,12 +13,11 @@ class MovementTypeEnum(Enum):
 
 class Movement(Model):
     __table_name__ = 'movements'
-    id = Field(name='id')
-    type = Field(name='type')
-    date = DateField(name='date')
-    value = Field(name='value')
-    note = Field(name='note')
-    category = ForeignKeyField(name='category', to=Category)
+    _type = Field(name='type')
+    _date = DateField(name='date')
+    _value = Field(name='value')
+    _note = Field(name='note')
+    _category = ForeignKeyField(name='category', to=Category)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
