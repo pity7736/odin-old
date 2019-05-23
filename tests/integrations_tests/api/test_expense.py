@@ -4,7 +4,7 @@ from graphql import graphql
 from graphql.execution.executors.asyncio import AsyncioExecutor
 from pytest import mark
 
-from src.api import schema
+from odin.api import schema
 from tests.factories import MovementFactory
 
 

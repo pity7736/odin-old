@@ -3,7 +3,7 @@ from enum import Enum
 from gideon.fields import Field, DateField, ForeignKeyField
 from gideon.models import Model
 
-from src.accounting.models import Category
+from odin.accounting.models import Category
 
 
 class MovementTypeEnum(Enum):

@@ -1,4 +1,4 @@
-from src.accounting.models import Category
+from odin.accounting.models import Category
 
 
 def test_attributes():

@@ -2,7 +2,7 @@ import datetime
 
 import factory
 
-from src.accounting.models import Category, Movement, Tag
+from odin.accounting.models import Category, Movement, Tag
 
 
 class CategoryFactory(factory.Factory):

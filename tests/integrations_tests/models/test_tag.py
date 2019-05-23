@@ -1,6 +1,6 @@
 from pytest import mark
 
-from src.accounting.models import Tag
+from odin.accounting.models import Tag
 
 
 @mark.asyncio

@@ -2,7 +2,7 @@ from graphql import graphql
 from graphql.execution.executors.asyncio import AsyncioExecutor
 from pytest import mark
 
-from src.api import schema
+from odin.api import schema
 from tests.factories import CategoryFactory
 
 
@@ -61,7 +61,7 @@ def test_category_mutation(create_db, db_transaction, graph_client):
 
     assert result == {
         'data': {
-            'createCategory':{
+            'createCategory': {
                 'category': {
                     'name': 'test category mutation',
                     'description': 'test description'

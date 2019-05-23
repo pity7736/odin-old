@@ -3,7 +3,7 @@ import subprocess
 import asyncpg
 from pytest import fixture
 
-from src import settings
+from odin import settings
 from tests.factories import CategoryFactory, MovementFactory
 
 

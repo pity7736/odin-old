@@ -1,9 +1,9 @@
 import graphene
 
-from src.accounting.models import Category, Movement
-from src.accounting.mutations.category import CreateCategoryMutation
-from src.accounting.mutations.movement import CreateExpenseMutation
-from src.accounting.schemas import CategoryObjectType, MovementObjectType
+from odin.accounting.models import Category, Movement
+from odin.accounting.mutations.category import CreateCategoryMutation
+from odin.accounting.mutations.movement import CreateExpenseMutation
+from odin.accounting.schemas import CategoryObjectType, MovementObjectType
 
 
 class Query(graphene.ObjectType):

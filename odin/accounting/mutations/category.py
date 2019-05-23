@@ -1,7 +1,7 @@
 import graphene
 
-from src.accounting.models import Category
-from src.accounting.schemas import CategoryObjectType
+from odin.accounting.models import Category
+from odin.accounting.schemas import CategoryObjectType
 
 
 class CreateCategoryMutation(graphene.Mutation):
@@ -14,4 +14,6 @@ class CreateCategoryMutation(graphene.Mutation):
     async def mutate(self, info, name, description):
         category = Category(name=name, description=description)
         await category.save()
-        return CreateCategoryMutation(category=CategoryObjectType(id=category.id, name=category.name, description=category.description))
+        return CreateCategoryMutation(
+            category=CategoryObjectType(id=category.id, name=category.name, description=category.description)
+        )

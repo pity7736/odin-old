@@ -1,7 +1,7 @@
 import graphene
 
 from .category import CategoryObjectType
-from src.accounting.models.movement import MovementTypeEnum
+from odin.accounting.models.movement import MovementTypeEnum
 
 
 MovementType = graphene.Enum.from_enum(MovementTypeEnum)

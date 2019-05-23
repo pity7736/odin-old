@@ -1,7 +1,7 @@
 import graphene
 
-from src.accounting.models import Movement
-from src.accounting.schemas import MovementObjectType
+from odin.accounting.models import Movement
+from odin.accounting.schemas import MovementObjectType
 
 
 class ExpenseInput(graphene.InputObjectType):
@@ -30,4 +30,3 @@ class CreateExpenseMutation(graphene.Mutation):
             note=movement.note,
             category=await movement.get_category()
         ))
-

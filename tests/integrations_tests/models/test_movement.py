@@ -3,7 +3,7 @@ import datetime
 from asyncpg import NotNullViolationError
 from pytest import mark, raises
 
-from src.accounting.models import Movement
+from odin.accounting.models import Movement
 from tests.factories import TagFactory
 
 

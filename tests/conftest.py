@@ -5,7 +5,7 @@ from graphql.execution.executors.asyncio import AsyncioExecutor
 from pytest import fixture
 import uvloop
 
-from src.api import schema
+from odin.api import schema
 
 
 @fixture(scope='session')

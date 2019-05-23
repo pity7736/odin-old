@@ -24,4 +24,3 @@ def init_graphql(app, loop):
 @app.route('/')
 async def root(request):
     return json({'hello': 'world'})
-

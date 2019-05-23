@@ -1,7 +1,7 @@
 from asyncpg import NotNullViolationError
 from pytest import mark, raises
 
-from src.accounting.models import Category
+from odin.accounting.models import Category
 from tests.factories import CategoryFactory
 
 
