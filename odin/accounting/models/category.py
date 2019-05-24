@@ -1,8 +1,8 @@
-from gideon.fields import Field
+from gideon.fields import CharField
 from gideon.models import Model
 
 
 class Category(Model):
     __table_name__ = 'categories'
-    _name = Field(name='name')
-    _description = Field(name='description')
+    _name = CharField(name='name')
+    _description = CharField(name='description')

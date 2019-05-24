@@ -9,4 +9,4 @@ pytest-mock==1.10.0
 radon==3.0.1
 sanic-graphql==1.1.0
 uvloop==0.11.2
--e git+git@github.com:pity7736/gideon-db.git@d78d1232bc344356dd9001becd3fcc1989265c81#egg=gideon
+-e git+git@github.com:pity7736/gideon-db.git@84a0491755b07e6703a72943b0467f8a9c733adc#egg=gideon

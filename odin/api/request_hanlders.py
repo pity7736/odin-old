@@ -17,7 +17,7 @@ def init_graphql(app, loop):
             executor=AsyncioExecutor(loop=loop),
             graphiql=True
         ),
-        '/graphql'
+        '/api/'
     )
 
 

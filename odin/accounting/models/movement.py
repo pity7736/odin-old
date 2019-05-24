@@ -1,6 +1,6 @@
 from enum import Enum
 
-from gideon.fields import Field, DateField, ForeignKeyField
+from gideon.fields import CharField, IntegerField, DateField, ForeignKeyField
 from gideon.models import Model
 
 from odin.accounting.models import Category
@@ -13,10 +13,10 @@ class MovementTypeEnum(Enum):
 
 class Movement(Model):
     __table_name__ = 'movements'
-    _type = Field(name='type')
+    _type = CharField(name='type')
     _date = DateField(name='date')
-    _value = Field(name='value')
-    _note = Field(name='note')
+    _value = IntegerField(name='value')
+    _note = CharField(name='note')
     _category = ForeignKeyField(name='category', to=Category)
 
     def __init__(self, **kwargs):
