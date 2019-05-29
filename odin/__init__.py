@@ -1,1 +1,1 @@
-from .api.request_hanlders import app  # noqa: F401
+from .api import app  # noqa: F401
