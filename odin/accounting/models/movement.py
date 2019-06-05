@@ -3,7 +3,8 @@ from enum import Enum
 from gideon.fields import CharField, IntegerField, DateField, ForeignKeyField
 from gideon.models import Model
 
-from odin.accounting.models import Category
+from .category import Category
+from .wallet import Wallet
 
 
 class MovementTypeEnum(Enum):
@@ -18,6 +19,7 @@ class Movement(Model):
     _value = IntegerField(name='value')
     _note = CharField(name='note')
     _category = ForeignKeyField(name='category', to=Category)
+    _wallet = ForeignKeyField(name='wallet', to=Wallet)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -33,6 +35,13 @@ class Movement(Model):
 
         self.category = await Category.get(id=self.category_id)
         return self.category
+
+    async def get_wallet(self):
+        if self.wallet:
+            return self.wallet
+
+        self.wallet = await Wallet.get(id=self.wallet_id)
+        return self.wallet
 
     async def add_tags(self, *tags):
         con = await self._get_connection()

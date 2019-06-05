@@ -89,14 +89,15 @@ def test_query_movement_with_category(create_db, db_transaction, movement, graph
     }
 
 
-def test_expense_mutation(create_db, db_transaction, graph_client, category):
+def test_expense_mutation(create_db, db_transaction, graph_client, category, wallet):
     mutation = f'''
         mutation {{
             createExpense(data: {{
                     date: "{datetime.date.today()}",
                     value: 20000,
                     note: "test",
-                    categoryId: {category.id}
+                    categoryId: {category.id},
+                    walletId: {wallet.id}
                 }}) {{
                 expense {{
                     type
@@ -134,11 +135,12 @@ def test_expense_mutation(create_db, db_transaction, graph_client, category):
 
 
 @mark.asyncio
-async def test_query_all_expenses(create_db, db_transaction, category):
+async def test_query_all_expenses(create_db, db_transaction, category, wallet):
     expenses = MovementFactory.create_batch(5)
     for i, expense in enumerate(expenses):
         expense.note = f'note {i}'
         expense.category = category
+        expense.wallet = wallet
         await expense.save()
 
     query = '''
@@ -149,10 +151,12 @@ async def test_query_all_expenses(create_db, db_transaction, category):
                 category {
                     name
                 }
+                wallet {
+                    name
+                }
             }
         }
     '''
-
     result = await graphql(schema, query, executor=AsyncioExecutor(), return_promise=True)
 
     assert result.data == {
@@ -162,6 +166,9 @@ async def test_query_all_expenses(create_db, db_transaction, category):
                 'note': 'note 0',
                 'category': {
                     'name': category.name
+                },
+                'wallet': {
+                    'name': wallet.name
                 }
             },
             {
@@ -169,6 +176,9 @@ async def test_query_all_expenses(create_db, db_transaction, category):
                 'note': 'note 1',
                 'category': {
                     'name': category.name
+                },
+                'wallet': {
+                    'name': wallet.name
                 }
             },
             {
@@ -176,6 +186,9 @@ async def test_query_all_expenses(create_db, db_transaction, category):
                 'note': 'note 2',
                 'category': {
                     'name': category.name
+                },
+                'wallet': {
+                    'name': wallet.name
                 }
             },
             {
@@ -183,6 +196,9 @@ async def test_query_all_expenses(create_db, db_transaction, category):
                 'note': 'note 3',
                 'category': {
                     'name': category.name
+                },
+                'wallet': {
+                    'name': wallet.name
                 }
             },
             {
@@ -190,6 +206,9 @@ async def test_query_all_expenses(create_db, db_transaction, category):
                 'note': 'note 4',
                 'category': {
                     'name': category.name
+                },
+                'wallet': {
+                    'name': wallet.name
                 }
             }
         ]

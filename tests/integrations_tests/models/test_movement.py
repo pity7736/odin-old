@@ -8,8 +8,14 @@ from tests.factories import TagFactory
 
 
 @mark.asyncio
-async def test_save_with_category_instance(create_db, db_transaction, category, connection):
-    movement = Movement(type='expense', date=datetime.date.today(), value=10000, category=category)
+async def test_save_with_category_instance(create_db, db_transaction, category, connection, wallet):
+    movement = Movement(
+        type='expense',
+        date=datetime.date.today(),
+        value=10000,
+        category=category,
+        wallet=wallet
+    )
     await movement.save()
     record = await connection.fetchrow(
         'select * from movements where id = $1',
@@ -24,8 +30,14 @@ async def test_save_with_category_instance(create_db, db_transaction, category, 
 
 
 @mark.asyncio
-async def test_save_with_category_id(create_db, db_transaction, category, connection):
-    movement = Movement(type='expense', date=datetime.date.today(), value=10000, category_id=category.id)
+async def test_save_with_category_id(create_db, db_transaction, category, connection, wallet):
+    movement = Movement(
+        type='expense',
+        date=datetime.date.today(),
+        value=10000,
+        category=category,
+        wallet=wallet
+    )
     await movement.save()
     record = await connection.fetchrow(
         'select * from movements where id = $1',
@@ -44,14 +56,6 @@ async def test_save_without_category(create_db):
     movement = Movement(type='expense', date=datetime.date.today(), value=10000)
     with raises(NotNullViolationError):
         await movement.save()
-
-
-@mark.asyncio
-async def test_save_with_isoformat_date(create_db, db_transaction, category):
-    movement = Movement(type='expense', date='2018-10-18', value=10000, category=category)
-    await movement.save()
-
-    assert movement.date == '2018-10-18'
 
 
 @mark.asyncio

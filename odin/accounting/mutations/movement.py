@@ -9,6 +9,7 @@ class ExpenseInput(graphene.InputObjectType):
     value = graphene.Int()
     note = graphene.String()
     category_id = graphene.Int()
+    wallet_id = graphene.Int()
 
 
 class CreateExpenseMutation(graphene.Mutation):
@@ -28,5 +29,6 @@ class CreateExpenseMutation(graphene.Mutation):
             date=movement.date,
             value=movement.value,
             note=movement.note,
-            category=await movement.get_category()
+            category=await movement.get_category(),
+            wallet=await movement.get_wallet()
         ))

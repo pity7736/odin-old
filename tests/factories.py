@@ -2,7 +2,7 @@ import datetime
 
 import factory
 
-from odin.accounting.models import Category, Movement, Tag
+from odin.accounting.models import Category, Movement, Tag, Wallet
 
 
 class CategoryFactory(factory.Factory):
@@ -19,6 +19,17 @@ class TagFactory(factory.Factory):
 
     class Meta:
         model = Tag
+
+
+class WalletFactory(factory.Factory):
+    id = factory.Sequence(lambda n: n)
+    name = 'test wallet'
+    initial_balance = 5_000_000
+    balance = 5_000_000
+    created = factory.LazyFunction(datetime.datetime.now)
+
+    class Meta:
+        model = Wallet
 
 
 class MovementFactory(factory.Factory):

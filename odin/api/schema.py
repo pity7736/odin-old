@@ -4,6 +4,7 @@ from odin.accounting.models import Category, Movement
 from odin.accounting.mutations.category import CreateCategoryMutation
 from odin.accounting.mutations.movement import CreateExpenseMutation
 from odin.accounting.schemas import CategoryObjectType, MovementObjectType
+from odin.accounting.schemas.wallet import WalletObjectType
 
 
 class Query(graphene.ObjectType):
@@ -46,13 +47,21 @@ class Query(graphene.ObjectType):
         result = []
         for expense in expenses:
             category = await expense.get_category()
+            wallet = await expense.get_wallet()
             result.append(MovementObjectType(
                 id=expense.id,
                 type=expense.type,
                 date=expense.date,
                 value=expense.value,
                 note=expense.note,
-                category=CategoryObjectType(id=category.id, name=category.name, description=category.description)
+                category=CategoryObjectType(id=category.id, name=category.name, description=category.description),
+                wallet=WalletObjectType(
+                    id=wallet.id,
+                    name=wallet.name,
+                    initial_balance=wallet.initial_balance,
+                    balance=wallet.balance,
+                    created=wallet.created
+                )
             ))
         return result
 
