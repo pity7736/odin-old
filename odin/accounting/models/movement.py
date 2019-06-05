@@ -1,9 +1,11 @@
 from enum import Enum
+from typing import List
 
 from gideon.fields import CharField, IntegerField, DateField, ForeignKeyField
 from gideon.models import Model
 
 from .category import Category
+from .tag import Tag
 from .wallet import Wallet
 
 
@@ -23,20 +25,20 @@ class Movement(Model):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._tags = []
+        self._tags: List[Tag] = []
 
     @classmethod
-    async def all_expenses(cls):
+    async def all_expenses(cls) -> List['Movement']:
         return await cls.filter(type='expense')
 
-    async def get_category(self):
+    async def get_category(self) -> Category:
         if self.category:
             return self.category
 
         self.category = await Category.get(id=self.category_id)
         return self.category
 
-    async def get_wallet(self):
+    async def get_wallet(self) -> Wallet:
         if self.wallet:
             return self.wallet
 
@@ -54,5 +56,5 @@ class Movement(Model):
         self._tags.extend(tags)
 
     @property
-    def tags(self):
+    def tags(self) -> List[Tag]:
         return self._tags
