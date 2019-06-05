@@ -1,3 +1,5 @@
+import asyncio
+
 import graphene
 
 from odin.accounting.models import Category, Movement
@@ -46,8 +48,7 @@ class Query(graphene.ObjectType):
         expenses = await Movement.all_expenses()
         result = []
         for expense in expenses:
-            category = await expense.get_category()
-            wallet = await expense.get_wallet()
+            category, wallet = await asyncio.gather(expense.get_category(), expense.get_wallet())
             result.append(MovementObjectType(
                 id=expense.id,
                 type=expense.type,

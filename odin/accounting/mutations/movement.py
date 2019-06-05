@@ -1,3 +1,5 @@
+import asyncio
+
 import graphene
 
 from odin.accounting.models import Movement
@@ -23,12 +25,13 @@ class CreateExpenseMutation(graphene.Mutation):
         data['type'] = 'expense'
         movement = Movement(**data)
         await movement.save()
+        category, wallet = await asyncio.gather(movement.get_category(), movement.get_wallet())
         return CreateExpenseMutation(MovementObjectType(
             id=movement.id,
             type=movement.type,
             date=movement.date,
             value=movement.value,
             note=movement.note,
-            category=await movement.get_category(),
-            wallet=await movement.get_wallet()
+            category=category,
+            wallet=wallet
         ))
