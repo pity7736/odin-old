@@ -7,6 +7,8 @@ pytest-cov==2.6.1
 pytest-dotenv==0.2.0
 pytest-mock==1.10.0
 radon==3.0.1
-sanic-graphql==1.1.0
-uvloop==0.11.2
+starlette==0.12.0
+ujson==1.35
+uvicorn==0.7.1
+uvloop==0.12.2
 -e git+git@github.com:pity7736/gideon-db.git@8135ac27ba9c002f9e60cb4e7efcdf6df4d5fd7f#egg=gideon
