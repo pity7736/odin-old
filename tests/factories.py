@@ -2,7 +2,7 @@ import datetime
 
 import factory
 
-from odin.accounting.models import Category, Movement, Tag, Wallet
+from odin.accounting.models import Category, Movement, Tag, Wallet, Event
 
 
 class CategoryFactory(factory.Factory):
@@ -30,6 +30,16 @@ class WalletFactory(factory.Factory):
 
     class Meta:
         model = Wallet
+
+
+class EventFactory(factory.Factory):
+    id = factory.Sequence(lambda n: n)
+    name = 'test event'
+    init_date = factory.LazyFunction(datetime.datetime.now)
+    end_date = factory.LazyAttribute(lambda e: e.init_date + datetime.timedelta(days=2))
+
+    class Meta:
+        model = Event
 
 
 class MovementFactory(factory.Factory):

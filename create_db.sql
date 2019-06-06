@@ -28,6 +28,13 @@ CREATE TABLE wallets (
 );
 CREATE INDEX wallets_name_index ON wallets(name);
 
+CREATE TABLE events (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(40) NOT NULL,
+  init_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  end_date TIMESTAMP WITHOUT TIME ZONE NOT NULL
+);
+
 CREATE TABLE movements (
   id SERIAL PRIMARY KEY,
   type VARCHAR(20) NOT NULL,
@@ -35,7 +42,8 @@ CREATE TABLE movements (
   date DATE NOT NULL,
   value NUMERIC(10, 2) NOT NULL CONSTRAINT movements_value_check CHECK (value > 0),
   note TEXT,
-  wallet_id INTEGER REFERENCES wallets NOT NULL
+  wallet_id INTEGER REFERENCES wallets NOT NULL,
+  event_id INTEGER REFERENCES events
 );
 CREATE INDEX movements_type_index ON movements(type);
 CREATE INDEX movements_category_index ON movements(category_id);

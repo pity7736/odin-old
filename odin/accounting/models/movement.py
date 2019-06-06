@@ -5,6 +5,7 @@ from gideon.fields import CharField, IntegerField, DateField, ForeignKeyField
 from gideon.models import Model
 
 from .category import Category
+from .event import Event
 from .tag import Tag
 from .wallet import Wallet
 
@@ -22,6 +23,7 @@ class Movement(Model):
     _note = CharField(name='note')
     _category = ForeignKeyField(name='category', to=Category)
     _wallet = ForeignKeyField(name='wallet', to=Wallet)
+    _event = ForeignKeyField(name='event', to=Event)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

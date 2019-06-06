@@ -4,7 +4,7 @@ import asyncpg
 from pytest import fixture
 
 from odin import settings
-from tests.factories import CategoryFactory, MovementFactory, WalletFactory
+from tests.factories import CategoryFactory, MovementFactory, WalletFactory, EventFactory
 
 
 @fixture(scope='session')
@@ -31,7 +31,7 @@ async def connection():
 async def db_transaction(connection):
     # TODO: refactor this for a better solution
     yield
-    await connection.execute('TRUNCATE categories, movements_tags, tags, movements;')
+    await connection.execute('TRUNCATE categories, movements_tags, tags, movements, wallets, events;')
     await connection.close()
 
 
@@ -47,6 +47,13 @@ async def wallet():
     w = WalletFactory()
     await w.save()
     return w
+
+
+@fixture
+async def event():
+    e = EventFactory()
+    await e.save()
+    return e
 
 
 @fixture

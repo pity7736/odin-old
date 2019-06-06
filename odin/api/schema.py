@@ -2,10 +2,10 @@ import asyncio
 
 import graphene
 
-from odin.accounting.models import Category, Movement
+from odin.accounting.models import Category, Movement, Event
 from odin.accounting.mutations.category import CreateCategoryMutation
 from odin.accounting.mutations.movement import CreateExpenseMutation
-from odin.accounting.schemas import CategoryObjectType, MovementObjectType
+from odin.accounting.schemas import CategoryObjectType, MovementObjectType, EventObjectType
 from odin.accounting.schemas.wallet import WalletObjectType
 
 
@@ -14,6 +14,7 @@ class Query(graphene.ObjectType):
     categories = graphene.List(CategoryObjectType)
     movement = graphene.Field(MovementObjectType, id=graphene.Int(required=True))
     expenses = graphene.List(MovementObjectType)
+    event = graphene.Field(EventObjectType, id=graphene.Int(required=True))
 
     @staticmethod
     async def resolve_category(root, info, id):
@@ -65,6 +66,10 @@ class Query(graphene.ObjectType):
                 )
             ))
         return result
+
+    @staticmethod
+    async def resolve_event(root, info, id):
+        return await Event.get(id=id)
 
 
 class Mutation(graphene.ObjectType):

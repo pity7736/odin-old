@@ -11,4 +11,4 @@ starlette==0.12.0
 ujson==1.35
 uvicorn==0.7.1
 uvloop==0.12.2
--e git+git@github.com:pity7736/gideon-db.git@8135ac27ba9c002f9e60cb4e7efcdf6df4d5fd7f#egg=gideon
+-e git+git@github.com:pity7736/gideon-db.git@cc5bb9547f92028238e858bbd52715b80660d77c#egg=gideon
