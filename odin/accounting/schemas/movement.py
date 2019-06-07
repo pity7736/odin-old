@@ -1,6 +1,7 @@
 import graphene
 
 from odin.accounting.models.movement import MovementTypeEnum
+from .event import EventObjectType
 from .category import CategoryObjectType
 from .wallet import WalletObjectType
 
@@ -16,3 +17,4 @@ class MovementObjectType(graphene.ObjectType):
     note = graphene.String()
     category = graphene.Field(CategoryObjectType)
     wallet = graphene.Field(WalletObjectType)
+    event = graphene.Field(EventObjectType)

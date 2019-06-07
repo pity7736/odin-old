@@ -47,6 +47,13 @@ class Movement(Model):
         self.wallet = await Wallet.get(id=self.wallet_id)
         return self.wallet
 
+    async def get_event(self) -> Event:
+        if self.event:
+            return self.event
+
+        self.event = await Event.get(id=self.event_id)
+        return self.event
+
     async def add_tags(self, *tags):
         con = await self._get_connection()
         values = [(tag.id, self.id) for tag in tags]

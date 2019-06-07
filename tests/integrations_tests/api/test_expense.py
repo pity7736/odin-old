@@ -89,7 +89,7 @@ def test_query_movement_with_category(create_db, db_transaction, movement, graph
     }
 
 
-def test_expense_mutation(create_db, db_transaction, graph_client, category, wallet):
+def test_expense_mutation(create_db, db_transaction, graph_client, category, wallet, event):
     mutation = f'''
         mutation {{
             createExpense(data: {{
@@ -97,7 +97,8 @@ def test_expense_mutation(create_db, db_transaction, graph_client, category, wal
                     value: 20000,
                     note: "test",
                     categoryId: {category.id},
-                    walletId: {wallet.id}
+                    walletId: {wallet.id},
+                    eventId: {event.id}
                 }}) {{
                 expense {{
                     type
@@ -108,6 +109,12 @@ def test_expense_mutation(create_db, db_transaction, graph_client, category, wal
                         id
                         name
                         description
+                    }}
+                    wallet {{
+                        name
+                    }}
+                    event {{
+                        name
                     }}
                 }}
             }}
@@ -127,7 +134,9 @@ def test_expense_mutation(create_db, db_transaction, graph_client, category, wal
                         'id': category.id,
                         'name': category.name,
                         'description': category.description
-                    }
+                    },
+                    'wallet': {'name': wallet.name},
+                    'event': {'name': event.name}
                 }
             }
         }
@@ -212,4 +221,88 @@ async def test_query_all_expenses(create_db, db_transaction, category, wallet):
                 }
             }
         ]
+    }
+
+
+def test_create_expense_without_required_values(create_db, db_transaction, graph_client):
+    mutation = f'''
+        mutation {{
+            createExpense(data: {{
+                    note: "test",
+                }}) {{
+                expense {{
+                    type
+                    date
+                    value
+                    note
+                    category {{
+                        id
+                        name
+                        description
+                    }}
+                    wallet {{
+                        name
+                    }}
+                    event {{
+                        name
+                    }}
+                }}
+            }}
+        }}
+    '''
+    result = graph_client.execute(mutation)
+
+    assert result['errors']
+
+
+def test_create_expense_without_date(create_db, db_transaction, graph_client, category, wallet, event):
+    mutation = f'''
+        mutation {{
+            createExpense(data: {{
+                    value: 20000,
+                    note: "test",
+                    categoryId: {category.id},
+                    walletId: {wallet.id},
+                    eventId: {event.id}
+                }}) {{
+                expense {{
+                    type
+                    date
+                    value
+                    note
+                    category {{
+                        id
+                        name
+                        description
+                    }}
+                    wallet {{
+                        name
+                    }}
+                    event {{
+                        name
+                    }}
+                }}
+            }}
+        }}
+    '''
+    result = graph_client.execute(mutation)
+
+    assert result == {
+        'data': {
+            'createExpense': {
+                'expense': {
+                    'type': 'EXPENSE',
+                    'date': str(datetime.date.today()),
+                    'value': 20000,
+                    'note': 'test',
+                    'category': {
+                        'id': category.id,
+                        'name': category.name,
+                        'description': category.description
+                    },
+                    'wallet': {'name': wallet.name},
+                    'event': {'name': event.name}
+                }
+            }
+        }
     }
