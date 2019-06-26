@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-pytest -vvvv --cov=odin --cov-report term-missing tests/
+pytest -vvvv -s --cov=odin --cov-report term-missing tests/
