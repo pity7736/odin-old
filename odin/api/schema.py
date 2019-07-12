@@ -8,6 +8,22 @@ from odin.accounting.mutations.movement import CreateExpenseMutation
 from odin.accounting.schemas import CategoryObjectType, MovementObjectType, EventObjectType
 
 
+def login_required(f):
+    print('f', f)
+
+    def qwe(root, info, *args, **kwargs):
+        print('args', args)
+        print('kwargs', kwargs)
+        user = info.context['request'].user
+        print('user', user)
+        print(user.is_authenticated)
+        if user.is_authenticated is False:
+            raise ValueError('login required!')
+        return f(root, info, *args, **kwargs)
+
+    return qwe
+
+
 class Query(graphene.ObjectType):
     category = graphene.Field(CategoryObjectType, id=graphene.Int(required=True))
     categories = graphene.List(CategoryObjectType)
@@ -21,7 +37,9 @@ class Query(graphene.ObjectType):
         return category
 
     @staticmethod
+    @login_required
     async def resolve_categories(root, info):
+        print('context', info.context['request'].user)
         categories = await Category.all()
         result = []
         for category in categories:
