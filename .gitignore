@@ -9,3 +9,5 @@ __pycache__/
 
 # coverage files
 .coverage
+
+dynamodb_local_db/

@@ -55,4 +55,14 @@ CREATE TABLE movements_tags (
   movement_id INTEGER REFERENCES movements NOT NULL
 );
 
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(200) NOT NULL UNIQUE,
+  password VARCHAR(150) NOT NULL,
+  first_name VARCHAR(300) NULL,
+  last_name VARCHAR(300) NULL,
+  created TIMESTAMP WITHOUT TIME ZONE
+);
+
+
 COMMIT;

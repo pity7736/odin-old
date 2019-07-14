@@ -1,7 +1,14 @@
 from odin.auth.utils import make_password
 
 
-def test_make_password():
-    password = make_password(raw_password='Th1s is a Pa$sword', salt='test')
-    assert password == 'test$sha512$200000$J5Za93zpx6imqOXST9Gn8JupUukV8wVG0tvvkkpUlIi1SR' \
-                       'SX2YELwIoQQBMvxb7wYmNQV4IwojPNn3IDoR5U9g=='
+def test_make_password(valid_password):
+    password, salt = make_password(raw_password=valid_password, salt='test')
+    assert password == 'sha512$200000$lYIU8uVSWAyTnJjbA8K6pUEHuyD/rtTqrC2gF' \
+                       '8b7eo6knLa209aZn0JhTOxLxTV+8y/icyDyJFZpvVHQdy9roA=='
+    assert salt == 'test'
+
+
+def test_random_salt_length(valid_password):
+    password, salt = make_password(raw_password=valid_password)
+
+    assert len(salt) == 32

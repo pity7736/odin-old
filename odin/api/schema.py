@@ -6,22 +6,8 @@ from odin.accounting.models import Category, Movement, Event
 from odin.accounting.mutations.category import CreateCategoryMutation
 from odin.accounting.mutations.movement import CreateExpenseMutation
 from odin.accounting.schemas import CategoryObjectType, MovementObjectType, EventObjectType
-
-
-def login_required(f):
-    print('f', f)
-
-    def qwe(root, info, *args, **kwargs):
-        print('args', args)
-        print('kwargs', kwargs)
-        user = info.context['request'].user
-        print('user', user)
-        print(user.is_authenticated)
-        if user.is_authenticated is False:
-            raise ValueError('login required!')
-        return f(root, info, *args, **kwargs)
-
-    return qwe
+from odin.auth.decorators import login_required
+from odin.auth.mutations import LoginMutation
 
 
 class Query(graphene.ObjectType):
@@ -32,6 +18,7 @@ class Query(graphene.ObjectType):
     event = graphene.Field(EventObjectType, id=graphene.Int(required=True))
 
     @staticmethod
+    @login_required
     async def resolve_category(root, info, id):
         category = await Category.get(id=id)
         return category
@@ -39,7 +26,6 @@ class Query(graphene.ObjectType):
     @staticmethod
     @login_required
     async def resolve_categories(root, info):
-        print('context', info.context['request'].user)
         categories = await Category.all()
         result = []
         for category in categories:
@@ -50,7 +36,7 @@ class Query(graphene.ObjectType):
     async def resolve_movement(root, info, id):
         movement = await Movement.get(id=id)
         if movement:
-            await movement.get_category()
+            await movement.get_category_()
             return movement
 
     @staticmethod
@@ -58,7 +44,7 @@ class Query(graphene.ObjectType):
         expenses = await Movement.all_expenses()
         result = []
         for expense in expenses:
-            await asyncio.gather(expense.get_category(), expense.get_wallet())
+            await asyncio.gather(expense.get_category_(), expense.get_wallet_())
             result.append(expense)
         return result
 
@@ -70,6 +56,7 @@ class Query(graphene.ObjectType):
 class Mutation(graphene.ObjectType):
     create_category = CreateCategoryMutation.Field()
     create_expense = CreateExpenseMutation.Field()
+    login = LoginMutation.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

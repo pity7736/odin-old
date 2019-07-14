@@ -33,21 +33,21 @@ class Movement(Model):
     async def all_expenses(cls) -> List['Movement']:
         return await cls.filter(type='expense')
 
-    async def get_category(self) -> Category:
+    async def get_category_(self) -> Category:
         if self.category:
             return self.category
 
         self.category = await Category.get(id=self.category_id)
         return self.category
 
-    async def get_wallet(self) -> Wallet:
+    async def get_wallet_(self) -> Wallet:
         if self.wallet:
             return self.wallet
 
         self.wallet = await Wallet.get(id=self.wallet_id)
         return self.wallet
 
-    async def get_event(self) -> Event:
+    async def get_event_(self) -> Event:
         if self.event:
             return self.event
 

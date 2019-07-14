@@ -1,9 +1,11 @@
 import subprocess
 
 import asyncpg
+import boto3
 from pytest import fixture
 
 from odin import settings
+from odin.settings import DYNAMODB_USER_CREDENTIALS_TABLE, DYNAMODB_HOST
 from tests.factories import CategoryFactory, MovementFactory, WalletFactory, EventFactory
 
 
@@ -31,8 +33,13 @@ async def connection():
 async def db_transaction(connection):
     # TODO: refactor this for a better solution
     yield
-    await connection.execute('TRUNCATE categories, movements_tags, tags, movements, wallets, events;')
+    await connection.execute('TRUNCATE categories, movements_tags, tags, movements, wallets, events, users;')
     await connection.close()
+    dynamodb = boto3.resource('dynamodb', endpoint_url=DYNAMODB_HOST)
+    table = dynamodb.Table(DYNAMODB_USER_CREDENTIALS_TABLE)
+    items = table.scan()['Items']
+    for item in items:
+        table.delete_item(Key={'email': item['email']})
 
 
 @fixture
@@ -58,6 +65,8 @@ async def event():
 
 @fixture
 async def movement(category, wallet):
-    mov = MovementFactory(category=category, wallet=wallet)
+    mov = MovementFactory.build(category=category, wallet=wallet)
+    print('mov', mov)
     await mov.save()
+    print('mov', mov)
     return mov

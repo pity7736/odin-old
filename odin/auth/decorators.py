@@ -1,10 +1,10 @@
-from starlette.authentication import AuthenticationError
+from starlette.authentication import AuthenticationError, UnauthenticatedUser
 
 
 def login_required(f):
     async def wrapper(root, info, *args, **kwargs):
         user = info.context['request'].user
-        if user.is_authenticated is False:
+        if isinstance(user, UnauthenticatedUser):
             raise AuthenticationError('login required!')
         return await f(root, info, *args, **kwargs)
     return wrapper

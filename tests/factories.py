@@ -3,6 +3,7 @@ import datetime
 import factory
 
 from odin.accounting.models import Category, Movement, Tag, Wallet, Event
+from odin.auth.models import User
 
 
 class CategoryFactory(factory.Factory):
@@ -50,3 +51,14 @@ class MovementFactory(factory.Factory):
 
     class Meta:
         model = Movement
+
+
+class UserFactory(factory.Factory):
+    email = factory.Faker('email')
+    password = factory.Faker('password')
+    first_name = factory.Faker('first_name')
+    last_name = factory.Faker('last_name')
+    created = factory.LazyFunction(datetime.datetime.now)
+
+    class Meta:
+        model = User

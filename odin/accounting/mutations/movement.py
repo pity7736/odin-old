@@ -29,8 +29,8 @@ class CreateExpenseMutation(graphene.Mutation):
         movement = Movement(**data)
         await movement.save()
         await asyncio.gather(
-            movement.get_category(),
-            movement.get_wallet(),
-            movement.get_event()
+            movement.get_category_(),
+            movement.get_wallet_(),
+            movement.get_event_()
         )
         return CreateExpenseMutation(movement)
