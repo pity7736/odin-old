@@ -1,3 +1,5 @@
+import asyncio
+
 import graphene
 
 from odin.auth.models import User
@@ -15,11 +17,10 @@ class LoginMutation(graphene.Mutation):
 
     @staticmethod
     async def mutate(root, info, email, password):
-        user = await User.get(email=email)
+        user, user_credential = await asyncio.gather(User.get(email=email), UserCredential.get(email=email))
         if user is None:
             return LoginMutation(token=None, message=f'Does not exists an user with email: {email}')
 
-        user_credential = await UserCredential.get(email=email)
         encrypted_password = make_password(raw_password=password, salt=user_credential.salt)[0]
         token = None
         message = 'email or password are wrong'
