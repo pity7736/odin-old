@@ -1,3 +1,4 @@
+aioboto3==6.4.1
 factory-boy==2.11.1
 gideon==0.0.0a5
 graphene==2.1.3
