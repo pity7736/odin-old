@@ -1,7 +1,7 @@
 import asyncio
 from typing import Tuple, Optional
 
-from odin.auth.models import User, UserCredential
+from odin.auth.models import User, UserCredentials, Token
 from odin.auth.utils import make_password
 
 
@@ -14,7 +14,7 @@ class LoginController:
     async def login(self) -> Tuple[Optional[str], str]:
         user, user_credential = await asyncio.gather(
             User.get(email=self._email),
-            UserCredential.get(email=self._email)
+            UserCredentials.get(email=self._email)
         )
         if user is None:
             return None, f'Does not exists an user with email: {self._email}'
@@ -23,7 +23,7 @@ class LoginController:
         token = None
         message = 'email or password are wrong'
         if encrypted_password == user.password:
-            token = 'hola'
+            token = (await Token.create_token(user=user)).value
             message = 'login successfully'
 
         return token, message

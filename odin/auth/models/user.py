@@ -2,7 +2,7 @@ from gideon.fields import CharField, DateTimeField
 from gideon.models import Model
 
 from odin.auth.utils import make_password
-from .user_credential import UserCredential
+from .user_credential import UserCredentials
 
 
 class User(Model):
@@ -15,5 +15,5 @@ class User(Model):
 
     async def set_password(self, raw_password):
         self._password, salt = make_password(raw_password=raw_password)
-        user_credentials = UserCredential(email=self._email, salt=salt)
+        user_credentials = UserCredentials(email=self._email, salt=salt)
         await user_credentials.save()

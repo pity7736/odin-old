@@ -5,7 +5,7 @@ import boto3
 from pytest import fixture
 
 from odin import settings
-from odin.settings import DYNAMODB_USER_CREDENTIALS_TABLE, DYNAMODB_HOST
+from odin.settings import DYNAMODB_USER_CREDENTIALS_TABLE, DYNAMODB_HOST, DYNAMODB_TOKEN_TABLE
 from tests.factories import CategoryFactory, MovementFactory, WalletFactory, EventFactory
 
 
@@ -40,6 +40,11 @@ async def db_transaction(connection):
     items = table.scan()['Items']
     for item in items:
         table.delete_item(Key={'email': item['email']})
+
+    table = dynamodb.Table(DYNAMODB_TOKEN_TABLE)
+    items = table.scan()['Items']
+    for item in items:
+        table.delete_item(Key={'value': item['value']})
 
 
 @fixture
