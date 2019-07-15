@@ -4,8 +4,6 @@ services:
   web:
     build: .
     command: python main.py
-    env_file:
-      - .env
     volumes:
       - .:/code
     ports:

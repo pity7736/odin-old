@@ -17,15 +17,15 @@ class Token:
     key: str
 
     @classmethod
-    async def get(cls, token) -> 'Token':
+    async def get(cls, value) -> 'Token':
         async with aioboto3.resource('dynamodb', region_name=AWS_REGION_NAME, endpoint_url=DYNAMODB_HOST) as dynamodb:
             table = dynamodb.Table(DYNAMODB_TOKEN_TABLE)
-            result = await table.query(KeyConditionExpression=Key('value').eq(token), Limit=1)
+            result = await table.query(KeyConditionExpression=Key('value').eq(value), Limit=1)
             items = result.get('Items')
             if items:
                 item = items[0]
                 return cls(
-                    value=token,
+                    value=value,
                     iv=item['iv'],
                     key=item['key']
                 )

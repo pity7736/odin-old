@@ -8,8 +8,12 @@ from odin.auth.backend import OdinAuthBackend
 from .schema import schema
 
 
+def on_error(conn, exec):
+    return UJSONResponse({'authentication error': str(exec)})
+
+
 app = Starlette(debug=True)
-app.add_middleware(AuthenticationMiddleware, backend=OdinAuthBackend())
+app.add_middleware(AuthenticationMiddleware, backend=OdinAuthBackend(), on_error=on_error)
 app.add_route('/api/', GraphQLApp(schema=schema, executor_class=AsyncioExecutor))
 
 
