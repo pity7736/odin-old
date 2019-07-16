@@ -1,4 +1,5 @@
 import datetime
+import random
 from dataclasses import dataclass
 
 import aioboto3
@@ -6,7 +7,7 @@ import ujson
 from boto3.dynamodb.conditions import Key
 
 from odin.settings import AWS_REGION_NAME, DYNAMODB_TOKEN_TABLE, DYNAMODB_HOST
-from odin.utils.crypto import AES256
+from odin.utils.crypto import AES256, get_random_string
 from .user import User
 
 
@@ -35,7 +36,8 @@ class Token:
         aes = AES256()
         data = ujson.dumps({
             'user_id': user.id,
-            'created_at': datetime.datetime.now()
+            'created_at': datetime.datetime.now(),
+            'data': get_random_string(length=random.randint(12, 50))
         })
         token = cls(
             value=aes.encrypt(data=data),
