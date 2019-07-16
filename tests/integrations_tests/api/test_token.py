@@ -46,7 +46,7 @@ async def test_success(create_db, db_transaction, valid_password, server):
 
 
 @mark.asyncio
-async def test_invalid_token(create_db, db_transaction, valid_password, server):
+async def test_non_exists_token(create_db, db_transaction, valid_password, server):
     user = UserFactory.build()
     await user.set_password(valid_password)
     await user.save()
@@ -66,4 +66,4 @@ async def test_invalid_token(create_db, db_transaction, valid_password, server):
             'Content-type': 'application/json'
         }
     )
-    assert response.json() == {'authentication error': 'invalid token!'}
+    assert response.json() == {'authentication error': 'invalid token'}

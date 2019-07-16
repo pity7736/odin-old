@@ -6,6 +6,8 @@ from typing import Union, Optional
 
 from Crypto.Cipher import AES
 
+from odin.exceptions import AESKeyError
+
 
 def pbkdf2(password: Union[str, bytes],
            salt: Union[str, bytes],
@@ -36,20 +38,27 @@ class AES256:
 
     _block_size = 16
     _mode = AES.MODE_CBC
+    _key_length = 32
 
     def __init__(self, key: Optional[str] = None, iv: Optional[str] = None):
+        if key:
+            assert len(key) == self._key_length
+
+        if iv:
+            assert len(iv) == 16
+
         self._key = key
         self._iv = iv
 
     def encrypt(self, data: str) -> str:
-        padded_data = data + (self._block_size - len(data) % self._block_size) * \
-                      chr(self._block_size - len(data) % self._block_size)
+        length_missing = self._block_size - len(data) % self._block_size
+        padded_data = data + length_missing * chr(length_missing)
         cipher = AES.new(key=self.key, IV=self.iv, mode=self._mode)
         return base64.b64encode(cipher.encrypt(padded_data)).decode()
 
     @property
     def key(self) -> str:
-        self._key = self._key or get_random_string(length=32)
+        self._key = self._key or get_random_string(length=self._key_length)
         return self._key
 
     @property
@@ -59,5 +68,8 @@ class AES256:
 
     def decrypt(self, data: str) -> str:
         cipher = AES.new(key=self._key, IV=self._iv, mode=self._mode)
-        padded_data = cipher.decrypt(base64.b64decode(data)).decode()
+        try:
+            padded_data = cipher.decrypt(base64.b64decode(data)).decode()
+        except UnicodeDecodeError:
+            raise AESKeyError('wrong key')
         return padded_data[:-ord(padded_data[len(padded_data) - 1:])]
