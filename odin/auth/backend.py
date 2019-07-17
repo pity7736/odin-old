@@ -1,3 +1,4 @@
+import datetime
 import typing
 from starlette.authentication import AuthenticationBackend, AuthCredentials, AuthenticationError
 from starlette.requests import Request
@@ -22,5 +23,9 @@ class OdinAuthBackend(AuthenticationBackend):
 
         aes = AES256(key=token.key, iv=token.iv)
         data = ujson.loads(aes.decrypt(value))
+        token_created = datetime.datetime.fromisoformat(data['created_at'])
+        if token_created < datetime.datetime.now() - datetime.timedelta(minutes=30):
+            raise AuthenticationError('token expired')
+
         user = await User.get(id=data['user_id'])
         return AuthCredentials([]), user

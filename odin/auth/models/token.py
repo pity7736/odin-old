@@ -34,11 +34,13 @@ class Token:
     @classmethod
     async def create_token(cls, user: User) -> 'Token':
         aes = AES256()
+        print('now', datetime.datetime.now())
         data = ujson.dumps({
             'user_id': user.id,
-            'created_at': datetime.datetime.now(),
+            'created_at': datetime.datetime.now().isoformat(),
             'data': get_random_string(length=random.randint(12, 50))
         })
+        print('token data', data)
         token = cls(
             value=aes.encrypt(data=data),
             iv=aes.iv,
