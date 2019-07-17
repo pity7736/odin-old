@@ -6,6 +6,7 @@ from starlette.requests import Request
 import ujson
 
 from odin.auth.models import Token, User
+from odin.settings import TOKEN_EXPIRATION_MINUTES_DELTA
 from odin.utils.crypto import AES256
 
 
@@ -24,7 +25,7 @@ class OdinAuthBackend(AuthenticationBackend):
         aes = AES256(key=token.key, iv=token.iv)
         data = ujson.loads(aes.decrypt(value))
         token_created = datetime.datetime.fromisoformat(data['created_at'])
-        if token_created < datetime.datetime.now() - datetime.timedelta(minutes=30):
+        if token_created < datetime.datetime.now() - datetime.timedelta(minutes=TOKEN_EXPIRATION_MINUTES_DELTA):
             raise AuthenticationError('token expired')
 
         user = await User.get(id=data['user_id'])
