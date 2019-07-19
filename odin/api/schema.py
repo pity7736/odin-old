@@ -20,8 +20,7 @@ class Query(graphene.ObjectType):
     @staticmethod
     @login_required
     async def resolve_category(root, info, id):
-        category = await Category.get(id=id)
-        return category
+        return await Category.get(id=id)
 
     @staticmethod
     @login_required
