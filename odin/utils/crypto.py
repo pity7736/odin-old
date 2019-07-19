@@ -4,7 +4,7 @@ import secrets
 import string
 from typing import Union, Optional
 
-from Crypto.Cipher import AES
+from Cryptodome.Cipher import AES
 
 from odin.exceptions import AESKeyError
 
@@ -53,8 +53,8 @@ class AES256:
     def encrypt(self, data: str) -> str:
         length_missing = self._block_size - len(data) % self._block_size
         padded_data = data + length_missing * chr(length_missing)
-        cipher = AES.new(key=self.key, IV=self.iv, mode=self._mode)
-        return base64.b64encode(cipher.encrypt(padded_data)).decode()
+        cipher = AES.new(key=self.key.encode(), iv=self.iv.encode(), mode=self._mode)
+        return base64.b64encode(cipher.encrypt(padded_data.encode())).decode()
 
     @property
     def key(self) -> str:
@@ -67,7 +67,7 @@ class AES256:
         return self._iv
 
     def decrypt(self, data: str) -> str:
-        cipher = AES.new(key=self._key, IV=self._iv, mode=self._mode)
+        cipher = AES.new(key=self._key.encode(), iv=self._iv.encode(), mode=self._mode)
         try:
             padded_data = cipher.decrypt(base64.b64decode(data)).decode()
         except UnicodeDecodeError:
