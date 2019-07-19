@@ -6,7 +6,7 @@ from odin.api import schema
 from tests.factories import CategoryFactory
 
 
-def test_query_existing_category(create_db, db_transaction, category, graph_client, graphql_context):
+def test_query_existing_category(create_db, db_transaction, category, graph_client, graphql_context_fixture):
     query = f'''
         query {{
             category(id: {category.id}) {{
@@ -15,7 +15,7 @@ def test_query_existing_category(create_db, db_transaction, category, graph_clie
             }}
         }}
     '''
-    result = graph_client.execute(query, context=graphql_context)
+    result = graph_client.execute(query, context=graphql_context_fixture)
 
     assert result == {
         'data': {
@@ -27,7 +27,7 @@ def test_query_existing_category(create_db, db_transaction, category, graph_clie
     }
 
 
-def test_query_non_existent_category(create_db, graph_client, graphql_context):
+def test_query_non_existent_category(create_db, graph_client, graphql_context_fixture):
     query = '''
         query {
             category(id: 1) {
@@ -37,7 +37,7 @@ def test_query_non_existent_category(create_db, graph_client, graphql_context):
             }
         }
     '''
-    result = graph_client.execute(query, context=graphql_context)
+    result = graph_client.execute(query, context=graphql_context_fixture)
 
     assert result == {
         'data': {
@@ -46,7 +46,7 @@ def test_query_non_existent_category(create_db, graph_client, graphql_context):
     }
 
 
-def test_category_mutation(create_db, db_transaction, graph_client, graphql_context):
+def test_category_mutation(create_db, db_transaction, graph_client, graphql_context_fixture):
     mutation = '''
         mutation {
             createCategory(name: "test category mutation", description: "test description") {
@@ -57,7 +57,7 @@ def test_category_mutation(create_db, db_transaction, graph_client, graphql_cont
             }
         }
     '''
-    result = graph_client.execute(mutation, context=graphql_context)
+    result = graph_client.execute(mutation, context=graphql_context_fixture)
 
     assert result == {
         'data': {
@@ -72,7 +72,7 @@ def test_category_mutation(create_db, db_transaction, graph_client, graphql_cont
 
 
 @mark.asyncio
-async def test_query_all_categories(create_db, db_transaction, graphql_context):
+async def test_query_all_categories(create_db, db_transaction, graphql_context_fixture):
     categories = CategoryFactory.create_batch(5)
     for i, category in enumerate(categories):
         category.name = f'name {i}'
@@ -86,7 +86,8 @@ async def test_query_all_categories(create_db, db_transaction, graphql_context):
         }
     '''
 
-    result = await graphql(schema, query, executor=AsyncioExecutor(), return_promise=True, context=graphql_context)
+    result = await graphql(schema, query, executor=AsyncioExecutor(), return_promise=True,
+                           context=graphql_context_fixture)
     assert result.data == {
         'categories': [
             {

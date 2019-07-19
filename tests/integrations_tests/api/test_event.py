@@ -1,5 +1,5 @@
 
-def test_query_event(event, graph_client):
+def test_query_event(event, graph_client, graphql_context_fixture):
     query = f'''
         query {{
             event(id: {event.id}) {{
@@ -10,7 +10,7 @@ def test_query_event(event, graph_client):
             }}
         }}
     '''
-    result = graph_client.execute(query)
+    result = graph_client.execute(query, context=graphql_context_fixture)
 
     assert result == {
         'data': {

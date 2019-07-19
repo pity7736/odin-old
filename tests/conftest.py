@@ -6,7 +6,6 @@ from pytest import fixture
 import uvloop
 
 from odin.api import schema
-from tests.factories import UserFactory
 
 
 @fixture(scope='session')
@@ -27,13 +26,3 @@ def graph_client(event_loop):
 @fixture
 def valid_password():
     return 'Th1s is a valid Pa$sword'
-
-
-@fixture
-def graphql_context():
-    class Request:
-        user = UserFactory.build()
-
-    return {
-        'request': Request()
-    }

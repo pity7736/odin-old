@@ -33,6 +33,7 @@ class Query(graphene.ObjectType):
         return result
 
     @staticmethod
+    @login_required
     async def resolve_movement(root, info, id):
         movement = await Movement.get(id=id)
         if movement:
@@ -40,6 +41,7 @@ class Query(graphene.ObjectType):
             return movement
 
     @staticmethod
+    @login_required
     async def resolve_expenses(root, info):
         expenses = await Movement.all_expenses()
         result = []
@@ -49,6 +51,7 @@ class Query(graphene.ObjectType):
         return result
 
     @staticmethod
+    @login_required
     async def resolve_event(root, info, id):
         return await Event.get(id=id)
 

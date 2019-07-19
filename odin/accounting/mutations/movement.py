@@ -5,6 +5,7 @@ import graphene
 
 from odin.accounting.models import Movement
 from odin.accounting.schemas import MovementObjectType
+from odin.auth.decorators import login_required
 
 
 class ExpenseInput(graphene.InputObjectType):
@@ -23,6 +24,7 @@ class CreateExpenseMutation(graphene.Mutation):
         data = ExpenseInput(required=True)
 
     @staticmethod
+    @login_required
     async def mutate(root, info, data):
         data['type'] = 'expense'
         data.setdefault('date', datetime.date.today())

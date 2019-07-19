@@ -1,14 +1,9 @@
 import datetime
 
-from graphql import graphql
-from graphql.execution.executors.asyncio import AsyncioExecutor
-from pytest import mark
-
-from odin.api import schema
 from tests.factories import MovementFactory
 
 
-def test_query_expense(create_db, db_transaction, movement, graph_client):
+def test_query_expense(create_db, db_transaction, movement, graph_client, graphql_context_fixture):
     query = f'''
         query {{
             movement(id: {movement.id}) {{
@@ -20,7 +15,7 @@ def test_query_expense(create_db, db_transaction, movement, graph_client):
             }}
         }}
     '''
-    result = graph_client.execute(query)
+    result = graph_client.execute(query, context=graphql_context_fixture)
 
     assert result == {
         'data': {
@@ -35,7 +30,7 @@ def test_query_expense(create_db, db_transaction, movement, graph_client):
     }
 
 
-def test_query_non_existent_movement(create_db, graph_client):
+def test_query_non_existent_movement(create_db, graph_client, graphql_context_fixture):
     query = '''
         query {
             movement(id: 1) {
@@ -47,7 +42,7 @@ def test_query_non_existent_movement(create_db, graph_client):
             }
         }
     '''
-    result = graph_client.execute(query)
+    result = graph_client.execute(query, context=graphql_context_fixture)
 
     assert result == {
         'data': {
@@ -56,7 +51,7 @@ def test_query_non_existent_movement(create_db, graph_client):
     }
 
 
-def test_query_movement_with_category(create_db, db_transaction, movement, graph_client):
+def test_query_movement_with_category(create_db, db_transaction, movement, graph_client, graphql_context_fixture):
     query = f'''
         query {{
             movement(id: {movement.id}) {{
@@ -71,7 +66,7 @@ def test_query_movement_with_category(create_db, db_transaction, movement, graph
             }}
         }}
     '''
-    result = graph_client.execute(query)
+    result = graph_client.execute(query, context=graphql_context_fixture)
 
     assert result == {
         'data': {
@@ -89,7 +84,8 @@ def test_query_movement_with_category(create_db, db_transaction, movement, graph
     }
 
 
-def test_expense_mutation(create_db, db_transaction, graph_client, category, wallet, event):
+def test_expense_mutation(create_db, db_transaction, graph_client, category, wallet, event, user_fixture,
+                          graphql_context_fixture):
     mutation = f'''
         mutation {{
             createExpense(data: {{
@@ -120,7 +116,8 @@ def test_expense_mutation(create_db, db_transaction, graph_client, category, wal
             }}
         }}
     '''
-    result = graph_client.execute(mutation)
+
+    result = graph_client.execute(mutation, context=graphql_context_fixture)
 
     assert result == {
         'data': {
@@ -143,14 +140,14 @@ def test_expense_mutation(create_db, db_transaction, graph_client, category, wal
     }
 
 
-@mark.asyncio
-async def test_query_all_expenses(create_db, db_transaction, category, wallet):
+def test_query_all_expenses(create_db, db_transaction, category, wallet, graph_client, event_loop,
+                            graphql_context_fixture):
     expenses = MovementFactory.create_batch(5)
     for i, expense in enumerate(expenses):
         expense.note = f'note {i}'
         expense.category = category
         expense.wallet = wallet
-        await expense.save()
+        event_loop.run_until_complete(expense.save())
 
     query = '''
         query {
@@ -166,61 +163,63 @@ async def test_query_all_expenses(create_db, db_transaction, category, wallet):
             }
         }
     '''
-    result = await graphql(schema, query, executor=AsyncioExecutor(), return_promise=True)
+    result = graph_client.execute(query, context=graphql_context_fixture)
 
-    assert result.data == {
-        'expenses': [
-            {
-                'value': 10000,
-                'note': 'note 0',
-                'category': {
-                    'name': category.name
+    assert result == {
+        'data': {
+            'expenses': [
+                {
+                    'value': 10000,
+                    'note': 'note 0',
+                    'category': {
+                        'name': category.name
+                    },
+                    'wallet': {
+                        'name': wallet.name
+                    }
                 },
-                'wallet': {
-                    'name': wallet.name
-                }
-            },
-            {
-                'value': 10000,
-                'note': 'note 1',
-                'category': {
-                    'name': category.name
+                {
+                    'value': 10000,
+                    'note': 'note 1',
+                    'category': {
+                        'name': category.name
+                    },
+                    'wallet': {
+                        'name': wallet.name
+                    }
                 },
-                'wallet': {
-                    'name': wallet.name
-                }
-            },
-            {
-                'value': 10000,
-                'note': 'note 2',
-                'category': {
-                    'name': category.name
+                {
+                    'value': 10000,
+                    'note': 'note 2',
+                    'category': {
+                        'name': category.name
+                    },
+                    'wallet': {
+                        'name': wallet.name
+                    }
                 },
-                'wallet': {
-                    'name': wallet.name
-                }
-            },
-            {
-                'value': 10000,
-                'note': 'note 3',
-                'category': {
-                    'name': category.name
+                {
+                    'value': 10000,
+                    'note': 'note 3',
+                    'category': {
+                        'name': category.name
+                    },
+                    'wallet': {
+                        'name': wallet.name
+                    }
                 },
-                'wallet': {
-                    'name': wallet.name
+                {
+                    'value': 10000,
+                    'note': 'note 4',
+                    'category': {
+                        'name': category.name
+                    },
+                    'wallet': {
+                        'name': wallet.name
+                    }
                 }
-            },
-            {
-                'value': 10000,
-                'note': 'note 4',
-                'category': {
-                    'name': category.name
-                },
-                'wallet': {
-                    'name': wallet.name
-                }
-            }
-        ]
+            ]
+        }
     }
 
 
@@ -255,7 +254,8 @@ def test_create_expense_without_required_values(create_db, db_transaction, graph
     assert result['errors']
 
 
-def test_create_expense_without_date(create_db, db_transaction, graph_client, category, wallet, event):
+def test_create_expense_without_date(create_db, db_transaction, graph_client, category, wallet, event,
+                                     graphql_context_fixture):
     mutation = f'''
         mutation {{
             createExpense(data: {{
@@ -285,7 +285,7 @@ def test_create_expense_without_date(create_db, db_transaction, graph_client, ca
             }}
         }}
     '''
-    result = graph_client.execute(mutation)
+    result = graph_client.execute(mutation, context=graphql_context_fixture)
 
     assert result == {
         'data': {

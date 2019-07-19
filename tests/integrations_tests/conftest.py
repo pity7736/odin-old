@@ -111,3 +111,11 @@ def user_fixture(valid_password, event_loop):
 def test_client_fixture():
     test_client = TestClient(app=app)
     return test_client
+
+
+@fixture
+def graphql_context_fixture(user_fixture):
+    class Request:
+        user = user_fixture
+
+    return {'request': Request()}
