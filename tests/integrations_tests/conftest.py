@@ -5,10 +5,11 @@ import asyncpg
 import boto3
 import uvicorn
 from pytest import fixture
+from starlette.testclient import TestClient
 
 from odin import settings, app
 from odin.settings import DYNAMODB_USER_CREDENTIALS_TABLE, DYNAMODB_HOST, DYNAMODB_TOKEN_TABLE
-from tests.factories import CategoryFactory, MovementFactory, WalletFactory, EventFactory
+from tests.factories import CategoryFactory, MovementFactory, WalletFactory, EventFactory, UserFactory
 
 
 @fixture(scope='session')
@@ -96,3 +97,17 @@ async def movement(category, wallet):
     await mov.save()
     print('mov', mov)
     return mov
+
+
+@fixture
+def user_fixture(valid_password, event_loop):
+    user = UserFactory.build()
+    event_loop.run_until_complete(user.set_password(valid_password))
+    event_loop.run_until_complete(user.save())
+    return user
+
+
+@fixture
+def test_client_fixture():
+    test_client = TestClient(app=app)
+    return test_client
