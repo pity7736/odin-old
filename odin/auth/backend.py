@@ -17,9 +17,13 @@ class OdinAuthBackend(AuthenticationBackend):
         if token_value is None:
             return
 
-        name, value = token_value.split(' ')
+        try:
+            name, value = token_value.split(' ')
+        except ValueError:
+            raise AuthenticationError('invalid token')
+
         token = await Token.get(value=value)
-        if token is None:
+        if token is None or name != 'Bearer':
             raise AuthenticationError('invalid token')
 
         aes = AES256(key=token.key, iv=token.iv)

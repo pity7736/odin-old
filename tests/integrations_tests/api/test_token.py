@@ -37,7 +37,7 @@ async def test_success(create_db, db_transaction, valid_password, server):
         'http://localhost:8889/api/',
         json={'query': query},
         headers={
-            'Authorization': f'Token {result.data["login"]["token"]}',
+            'Authorization': f'Bearer {result.data["login"]["token"]}',
             'Content-type': 'application/json'
         }
     )
@@ -66,7 +66,7 @@ async def test_non_exists_token(create_db, db_transaction, valid_password, serve
         'http://localhost:8889/api/',
         json={'query': query},
         headers={
-            'Authorization': f'Token anytoken',
+            'Authorization': f'Bearer anytoken',
             'Content-type': 'application/json'
         }
     )
@@ -100,7 +100,7 @@ async def test_expired_token(create_db, db_transaction, valid_password, server):
         'http://localhost:8889/api/',
         json={'query': query},
         headers={
-            'Authorization': f'Token {result.data["login"]["token"]}',
+            'Authorization': f'Bearer {result.data["login"]["token"]}',
             'Content-type': 'application/json'
         }
     )
@@ -135,7 +135,7 @@ async def test_valid_token(create_db, db_transaction, valid_password, server):
         'http://localhost:8889/api/',
         json={'query': query},
         headers={
-            'Authorization': f'Token {result.data["login"]["token"]}',
+            'Authorization': f'Bearer {result.data["login"]["token"]}',
             'Content-type': 'application/json'
         }
     )
@@ -145,3 +145,69 @@ async def test_valid_token(create_db, db_transaction, valid_password, server):
         },
         "errors": None
     }
+
+
+@mark.asyncio
+async def test_bearer_token(create_db, db_transaction, valid_password, server):
+    user = UserFactory.build()
+    await user.set_password(valid_password)
+    await user.save()
+    mutation = f'''
+        mutation {{
+            login(email: "{user._email}", password: "{valid_password}") {{
+                token
+                message
+            }}
+        }}
+    '''
+    result = await graphql(schema, mutation, executor=AsyncioExecutor(), return_promise=True)
+    query = '''
+        query {
+          categories {
+            name
+            description
+          }
+        }
+    '''
+    response = requests.post(
+        'http://localhost:8889/api/',
+        json={'query': query},
+        headers={
+            'Authorization': f'Token {result.data["login"]["token"]}',
+            'Content-type': 'application/json'
+        }
+    )
+    assert response.json() == {'authentication error': 'invalid token'}
+
+
+@mark.asyncio
+async def test_wrong_format_token(create_db, db_transaction, valid_password, server):
+    user = UserFactory.build()
+    await user.set_password(valid_password)
+    await user.save()
+    mutation = f'''
+        mutation {{
+            login(email: "{user._email}", password: "{valid_password}") {{
+                token
+                message
+            }}
+        }}
+    '''
+    result = await graphql(schema, mutation, executor=AsyncioExecutor(), return_promise=True)
+    query = '''
+        query {
+          categories {
+            name
+            description
+          }
+        }
+    '''
+    response = requests.post(
+        'http://localhost:8889/api/',
+        json={'query': query},
+        headers={
+            'Authorization': f'Bearer token {result.data["login"]["token"]}',
+            'Content-type': 'application/json'
+        }
+    )
+    assert response.json() == {'authentication error': 'invalid token'}
