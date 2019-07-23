@@ -1,6 +1,6 @@
 import datetime
 
-from tests.factories import MovementFactory
+from tests.factories import MovementFactory, TagFactory
 
 
 def test_query_expense(create_db, db_transaction, movement, graph_client, graphql_context_fixture):
@@ -302,6 +302,77 @@ def test_create_expense_without_date(create_db, db_transaction, graph_client, ca
                     },
                     'wallet': {'name': wallet.name},
                     'event': {'name': event.name}
+                }
+            }
+        }
+    }
+
+
+def test_add_expense_with_tags(create_db, db_transaction, graph_client, category, wallet, event,
+                               graphql_context_fixture, event_loop):
+    tags = TagFactory.create_batch(2)
+    tag_ids = []
+    for tag in tags:
+        event_loop.run_until_complete(tag.save())
+        tag_ids.append(tag.id)
+
+    mutation = f'''
+        mutation {{
+            createExpense(data: {{
+                    value: 20000,
+                    note: "test",
+                    categoryId: {category.id},
+                    walletId: {wallet.id},
+                    eventId: {event.id},
+                    tags: {tag_ids}
+                }}) {{
+                expense {{
+                    type
+                    date
+                    value
+                    note
+                    category {{
+                        id
+                        name
+                        description
+                    }}
+                    wallet {{
+                        name
+                    }}
+                    event {{
+                        name
+                    }}
+                    tags {{
+                        id
+                    }}
+                }}
+            }}
+        }}
+    '''
+    result = graph_client.execute(mutation, context=graphql_context_fixture)
+    assert result == {
+        'data': {
+            'createExpense': {
+                'expense': {
+                    'type': 'EXPENSE',
+                    'date': str(datetime.date.today()),
+                    'value': 20000,
+                    'note': 'test',
+                    'category': {
+                        'id': category.id,
+                        'name': category.name,
+                        'description': category.description
+                    },
+                    'wallet': {'name': wallet.name},
+                    'event': {'name': event.name},
+                    'tags': [
+                        {
+                            'id': tag_ids[0]
+                        },
+                        {
+                            'id': tag_ids[1]
+                        }
+                    ]
                 }
             }
         }
