@@ -11,6 +11,6 @@ pytest-dotenv==0.2.0
 pytest-mock==1.10.0
 radon==3.0.1
 starlette==0.12.0
-ujson==1.35
+ujson==5.4.0
 uvicorn==0.7.1
 uvloop==0.12.2
